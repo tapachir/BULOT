@@ -7,7 +7,7 @@ contract BULOT {
         uint ticket_no;
         bytes32 hash_rnd_number;
         address owner;
-        bool withdrawn = false;
+        bool withdrawn;
     }
 
     struct Lottery {
@@ -62,6 +62,7 @@ contract BULOT {
 
         require(erc20.call(bytes4(keccak256("transferFrom(address, address, uint)")), msg.sender, this, 10));
         Ticket t;
+        t.withdrawn = false;
         t.ticket_no =
         lotteries[getCurrentLotteryNo()].tickets.push(t);
 
