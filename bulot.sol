@@ -12,6 +12,7 @@ contract BULOT {
     struct Lottery {
         uint lottery_no;
         uint money_collected;
+        uint winnerNumber;
         Ticket[] tickets;
         Ticket[] validTickets;
         uint start;
