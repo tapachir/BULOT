@@ -1,6 +1,11 @@
 pragma solidity ^0.4.21;
 
+import "./erc20.sol";
+
+
 contract BULOT {
+    
+    EIP20 erc20;
 
     struct Ticket {
         uint ticket_no;
@@ -24,15 +29,14 @@ contract BULOT {
     //          a    b a
     // usersTicketNos a -> 0,2
     // b -> 1
-    address constant erc20 = 0xd9145CCE52D386f254917e481eB44e9943F39138;
     uint stagePeriod = 2 weeks;
     enum StageTypes {PURCHASE, REVEAL}
     Lottery[] lotteries;
     uint start;
     uint lottery_no = 0;
 
-    function() {
-        //TODO
+    function() public {
+        revert();
     }
 
 
@@ -46,6 +50,9 @@ contract BULOT {
         lotteries.push(l);
 
         start = now;
+        address ercAddress = 0xB34db0d5aA577998c10c80d76F87AfE58b024e5F;
+        
+        erc20 = EIP20(ercAddress);
     }
 
     // purchase: 1 2 3 4
@@ -60,7 +67,7 @@ contract BULOT {
     function buyTicket(bytes32 hash_rnd_number) public {
         // check if current lottery no -> ended
 
-        require(erc20.call(bytes4(keccak256("transferFrom(address, address, uint)")), msg.sender, this, 10));
+        require(erc20.transferFrom(msg.sender, address(this), 10));
         Ticket t;
         t.withdrawn = false;
         t.ticket_no =
@@ -72,10 +79,13 @@ contract BULOT {
     }
 
     function revealRndNumber(uint ticketno, uint rnd_number) public {
-        uint revealLotteryNo = getCurrentLotteryNo() - 1;
-        if(revealLotteryNo >= 0) {
+        
+        if(getCurrentLotteryNo() >= 1) {
+            
+            uint revealLotteryNo = getCurrentLotteryNo() - 1;
             bytes32 hash_rnd_number = sha3(rnd_number, msg.sender);
             Ticket t = lotteries[revealLotteryNo].tickets[ticketno];
+            
             if(t.hash_rnd_number == hash_rnd_number) {
                 t.owner = msg.sender;
                 // xor with new coming random number
@@ -155,9 +165,9 @@ contract BULOT {
       uint prize = checkIfTicketWon(lottery_no, ticket_no);
       require(prize > 0, "Sorry, your ticket didnt win");
 
-      // require(withdrawedTicketPrize)
+      //require(withdrawedTicketPrize)
 
-        // verifies the player hasn't withdrawn his prize
+// verifies the player hasn't withdrawn his prize
       require(lotteries[lottery_no].validTickets[ticket_no].withdrawn == false, "Prize for this ticket was already withdrawn");
 
 
@@ -165,6 +175,7 @@ contract BULOT {
       "Failed to transfer prize to your account.");
 
       lotteries[lottery_no].validTickets[ticket_no].withdrawn == true;
+
 
     }
     function getIthWinningTicket(uint i,	uint lottery_no) public view returns (uint ticket_no,uint amount) {
