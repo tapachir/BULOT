@@ -76,6 +76,8 @@ contract BULOT {
             Ticket t = lotteries[revealLotteryNo].tickets[ticketno];
             if(t.hash_rnd_number == hash_rnd_number) {
                 t.owner = msg.sender;
+                // xor with new coming random number
+                lotteries[revealLotteryNo].winnerNumber ^= rnd_number;
                 lotteries[revealLotteryNo].validTickets.push(t);
             }
         }
