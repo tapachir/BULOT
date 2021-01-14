@@ -147,14 +147,36 @@ contract BULOT {
             hashed_winner = keccak256(hashed_winner);
         }
         return 0;
-        
-        
     }
     function withdrawTicketPrize(uint lottery_no, uint ticket_no) public	{
         
     }
     function getIthWinningTicket(uint i,	uint lottery_no) public view returns (uint ticket_no,uint amount) {
-        // TODO
+        // get current lottary number to compare 
+        uint currentLotteryNo = getCurrentLotteryNo();
+        
+        // lottery has to be finished already 
+        require(lotteryNo < currentLotteryNo); 
+        
+        // total amount of money collected in that lottery
+        uint M = lotteries[lottery_no].money_collected;
+        
+        uint numOfWinners = logarithm2(M);
+        require(i <= numOfWinners); // < or <= ??
+        
+        uint P;
+        bytes32 hashed_winner = keccak256(lotteries[lottery_no].winnerNum);
+        // traverse all winners until the ith ticket comes
+        for(uint temp=0; temp <= i-1; temp++) {
+            P = M % 2;
+            M = M / 2;       
+            P += M;
+            if(temp==(i-1)) {
+                return (lotteries[lottery_no].validTickets[uint(hashed_winner) % lotteries[lottery_no].validTickets.length].ticket_no, P);
+            }
+            hashed_winner = keccak256(hashed_winner);
+        }
+        
         
     }
     // lottery no's start from 0
