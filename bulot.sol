@@ -1,13 +1,14 @@
 pragma solidity ^0.4.21;
 
 contract BULOT {
-    
+
     struct Ticket {
         uint ticket_no;
         bytes32 hash_rnd_number;
         address owner;
+        bool withdrawn;
     }
-    
+
     struct Lottery {
         uint lottery_no;
         uint money_collected;
@@ -16,7 +17,7 @@ contract BULOT {
         mapping(uint => Ticket) validTickets;
         uint start;
         StageTypes stage;
-        mapping(address => uint[]) usersTicketNos; 
+        mapping(address => uint[]) usersTicketNos;
     }
     // tickets: 0    1 2 3 4
     //          a    b a
@@ -28,28 +29,28 @@ contract BULOT {
     Lottery[] lotteries;
     uint start;
     uint lottery_no = 0;
-    
+
     function() {
         //TODO
     }
-    
-    
+
+
     constructor() {
         Lottery l;
         l.lottery_no = 0;
         l.money_collected = 0;
         l.start = now;
         l.stage = StageTypes.PURCHASE;
-        
+
         lotteries.push(l);
-        
+
         start = now;
     }
-    
+
     // purchase: 1 2 3 4
     // reveal: 1 2 3
     // winner: (1,2,3)
-    
+
     // buy
     // reveal
     // decide winners
@@ -57,17 +58,18 @@ contract BULOT {
 
     function buyTicket(bytes32 hash_rnd_number) public {
         // check if current lottery no -> ended
-        
+
         require(erc20.call(bytes4(keccak256("transferFrom(address, address, uint)")), msg.sender, this, 10));
         Ticket t;
-        t.ticket_no = 
+        t.withdrawn = false;
+        t.ticket_no =
         lotteries[getCurrentLotteryNo()].tickets.push(t);
-        
+
         uint index = lotteries[getCurrentLotteryNo()].tickets.length - 1;
         lotteries[getCurrentLotteryNo()].usersTicketNos[msg.sender].push(index);
         lotteries[getCurrentLotteryNo()].money_collected += 10;
     }
-    
+
     function revealRndNumber(uint ticketno, uint rnd_number) public {
         uint revealLotteryNo = getCurrentLotteryNo() - 1;
         if(revealLotteryNo >= 0) {
@@ -121,24 +123,24 @@ contract BULOT {
         }
     }
     function checkIfTicketWon(uint lottery_no, uint ticket_no) public view returns (uint	amount) {
-        // get current lottary number to compare 
+        // get current lottary number to compare
         uint currentLotteryNo = getCurrentLotteryNo();
-        
+
         // lottery has to be finished already in order to check whether the ticket won or not
         require(lottery_no < currentLotteryNo); 
         
         // total amount of money collected in that lottery
         uint M = lotteries[lottery_no].money_collected;
-        
+
         uint numOfWinners = logarithm2(M);
-        
+
         uint P;
         bytes32 hashed_winner = keccak256(lotteries[lottery_no].winnerNum);
         // traverse all winners until the ticket asked comes
         // calculate P(i)
         for(uint i=0; i <= numOfWinners; i++) {
             P = M % 2;
-            M = M / 2;       
+            M = M / 2;
             P += M;
             if(lotteries[lottery_no].validTickets[ticket_no].owner==lotteries[lottery_no].validTickets[uint(hashed_winner) % lotteries[lottery_no].validTickets.length].owner) {
                 return P;
@@ -148,7 +150,21 @@ contract BULOT {
         return 0;
     }
     function withdrawTicketPrize(uint lottery_no, uint ticket_no) public	{
-        
+      uint prize = checkIfTicketWon(lottery_no, ticket_no);
+      require(prize > 0, "Sorry, your ticket didnt win")
+
+      require(withdrawedTicketPrize)
+
+// verifies the player hasn't withdrawn his prize
+      require(lotteries[lottery_no].validTickets[ticket_no].withdrawn == false, "Prize for this ticket was already withdrawn");
+
+
+      require(erc20.call(bytes4(keccak256("transfer(address, uint)")), msg.sender, prize),
+      "Failed to transfer prize to your account.");
+
+      lotteries[lottery_no].validTickets[ticket_no].withdrawn == true,
+
+
     }
     function getIthWinningTicket(uint i,	uint lottery_no) public view returns (uint ticket_no,uint amount) {
         // get current lottary number to compare 
@@ -182,7 +198,7 @@ contract BULOT {
     // at a given time, one lottery is in purchase period, and the previous one is in the reveal period
     function getCurrentLotteryNo() public view returns (uint lottery_no) {
         return (now - start)/(1 weeks);   // return lottery_no that is in the purchase period
-        
+
     }
     function getMoneyCollected(uint lottery_no) public view returns (uint amount) {
         return lotteries[lottery_no].money_collected;
