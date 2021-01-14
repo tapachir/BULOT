@@ -126,7 +126,7 @@ contract BULOT {
         uint currentLotteryNo = getCurrentLotteryNo();
         
         // lottery has to be finished already in order to check whether the ticket won or not
-        require(_lotteryNo < currentLotteryNo); 
+        require(lotteryNo < currentLotteryNo); 
         
         // total amount of money collected in that lottery
         uint M = lotteries[lottery_no].money_collected;
