@@ -122,12 +122,39 @@ contract BULOT {
         }
     }
     function checkIfTicketWon(uint lottery_no, uint ticket_no) public view returns (uint	amount) {
+        // get current lottary number to compare 
+        uint currentLotteryNo = getCurrentLotteryNo();
+        
+        // lottery has to be finished already in order to check whether the ticket won or not
+        require(_lotteryNo < currentLotteryNo); 
+        
+        // total amount of money collected in that lottery
+        uint M = lotteries[lottery_no].money_collected;
+        
+        uint numOfWinners = logarithm2(M);
+        
+        uint P;
+        bytes32 hashed_winner = keccak256(lotteries[lottery_no].winnerNum);
+        // traverse all winners until the ticket asked comes
+        // calculate P(i)
+        for(uint i=0; i <= numOfWinners; i++) {
+            if(lotteries[lottery_no].validTickets[ticket_no].owner==lotteries[lottery_no].validTickets[uint(hashed_winner) % lotteries[lottery_no].revealedPlayerslength].owner) {
+                return P;
+            }
+            P = M % 2;
+            M = M / 2;       // does it have to be binary operation? 
+            P += M;
+            hashed_winner = keccak256(hashed_winner);
+        }
+        return 0;
+        
         
     }
     function withdrawTicketPrize(uint lottery_no, uint ticket_no) public	{
         
     }
     function getIthWinningTicket(uint i,	uint lottery_no) public view returns (uint ticket_no,uint amount) {
+        // TODO
         
     }
     // lottery no's start from 0
