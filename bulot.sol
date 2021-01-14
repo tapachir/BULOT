@@ -15,6 +15,7 @@ contract BULOT {
         uint winnerNumber;
         Ticket[] tickets;
         mapping(uint => Ticket) validTickets;
+        uint numOfValidTickets;
         uint start;
         StageTypes stage;
         mapping(address => uint[]) usersTicketNos;
@@ -80,6 +81,7 @@ contract BULOT {
                 // xor with new coming random number
                 lotteries[revealLotteryNo].winnerNumber ^= rnd_number;
                 lotteries[revealLotteryNo].validTickets[ticketno]=t;
+                lotteries[revealLotteryNo].numOfValidTickets++;
             }
         }
     }
@@ -135,14 +137,14 @@ contract BULOT {
         uint numOfWinners = logarithm2(M);
 
         uint P;
-        bytes32 hashed_winner = keccak256(lotteries[lottery_no].winnerNum);
+        bytes32 hashed_winner = keccak256(lotteries[lottery_no].winnerNumber);
         // traverse all winners until the ticket asked comes
         // calculate P(i)
         for(uint i=0; i <= numOfWinners; i++) {
             P = M % 2;
             M = M / 2;
             P += M;
-            if(lotteries[lottery_no].validTickets[ticket_no].owner==lotteries[lottery_no].validTickets[uint(hashed_winner) % lotteries[lottery_no].validTickets.length].owner) {
+            if(lotteries[lottery_no].validTickets[ticket_no].owner==lotteries[lottery_no].validTickets[uint(hashed_winner) % lotteries[lottery_no].numOfValidTickets].owner) {
                 return P;
             }
             hashed_winner = keccak256(hashed_winner);
@@ -151,19 +153,18 @@ contract BULOT {
     }
     function withdrawTicketPrize(uint lottery_no, uint ticket_no) public	{
       uint prize = checkIfTicketWon(lottery_no, ticket_no);
-      require(prize > 0, "Sorry, your ticket didnt win")
+      require(prize > 0, "Sorry, your ticket didnt win");
 
-      require(withdrawedTicketPrize)
+      // require(withdrawedTicketPrize)
 
-// verifies the player hasn't withdrawn his prize
+        // verifies the player hasn't withdrawn his prize
       require(lotteries[lottery_no].validTickets[ticket_no].withdrawn == false, "Prize for this ticket was already withdrawn");
 
 
       require(erc20.call(bytes4(keccak256("transfer(address, uint)")), msg.sender, prize),
       "Failed to transfer prize to your account.");
 
-      lotteries[lottery_no].validTickets[ticket_no].withdrawn == true,
-
+      lotteries[lottery_no].validTickets[ticket_no].withdrawn == true;
 
     }
     function getIthWinningTicket(uint i,	uint lottery_no) public view returns (uint ticket_no,uint amount) {
@@ -180,14 +181,14 @@ contract BULOT {
         require(i <= numOfWinners); // < or <= ??
         
         uint P;
-        bytes32 hashed_winner = keccak256(lotteries[lottery_no].winnerNum);
+        bytes32 hashed_winner = keccak256(lotteries[lottery_no].winnerNumber);
         // traverse all winners until the ith ticket comes
         for(uint temp=0; temp <= i-1; temp++) {
             P = M % 2;
             M = M / 2;       
             P += M;
             if(temp==(i-1)) {
-                return (lotteries[lottery_no].validTickets[uint(hashed_winner) % lotteries[lottery_no].validTickets.length].ticket_no, P);
+                return (lotteries[lottery_no].validTickets[uint(hashed_winner) % lotteries[lottery_no].numOfValidTickets].ticket_no, P);
             }
             hashed_winner = keccak256(hashed_winner);
         }
