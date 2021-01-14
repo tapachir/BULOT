@@ -14,7 +14,7 @@ contract BULOT {
         uint money_collected;
         uint winnerNumber;
         Ticket[] tickets;
-        Ticket[] validTickets;
+        mapping(uint => Ticket) validTickets;
         uint start;
         StageTypes stage;
         mapping(address => uint[]) usersTicketNos; 
@@ -78,7 +78,7 @@ contract BULOT {
                 t.owner = msg.sender;
                 // xor with new coming random number
                 lotteries[revealLotteryNo].winnerNumber ^= rnd_number;
-                lotteries[revealLotteryNo].validTickets.push(t);
+                lotteries[revealLotteryNo].validTickets[ticketno]=t;
             }
         }
     }
@@ -138,12 +138,12 @@ contract BULOT {
         // traverse all winners until the ticket asked comes
         // calculate P(i)
         for(uint i=0; i <= numOfWinners; i++) {
-            if(lotteries[lottery_no].validTickets[ticket_no].owner==lotteries[lottery_no].validTickets[uint(hashed_winner) % lotteries[lottery_no].revealedPlayerslength].owner) {
+            P = M % 2;
+            M = M / 2;       
+            P += M;
+            if(lotteries[lottery_no].validTickets[ticket_no].owner==lotteries[lottery_no].validTickets[uint(hashed_winner) % lotteries[lottery_no].validTickets.length].owner) {
                 return P;
             }
-            P = M % 2;
-            M = M / 2;       // does it have to be binary operation? 
-            P += M;
             hashed_winner = keccak256(hashed_winner);
         }
         return 0;
