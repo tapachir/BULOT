@@ -1,6 +1,11 @@
 pragma solidity ^0.4.21;
 
+import "./erc20.sol";
+
+
 contract BULOT {
+    
+    EIP20 erc20;
 
     struct Ticket {
         uint ticket_no;
@@ -24,15 +29,14 @@ contract BULOT {
     //          a    b a
     // usersTicketNos a -> 0,2
     // b -> 1
-    address constant erc20 = 0xd9145CCE52D386f254917e481eB44e9943F39138;
     uint stagePeriod = 2 weeks;
     enum StageTypes {PURCHASE, REVEAL}
-    Lottery[] lotteries;
+    mapping(uint => Lottery) lotteries;
     uint start;
     uint lottery_no = 0;
 
-    function() {
-        //TODO
+    function() public {
+        revert();
     }
 
 
@@ -43,9 +47,12 @@ contract BULOT {
         l.start = now;
         l.stage = StageTypes.PURCHASE;
 
-        lotteries.push(l);
+        lotteries[0]=l;
 
         start = now;
+        address ercAddress = 0xCf19DeBf8359fd17bd36AdBd71869CA9E8E4FacC;
+        
+        erc20 = EIP20(ercAddress);
     }
 
     // purchase: 1 2 3 4
@@ -60,7 +67,7 @@ contract BULOT {
     function buyTicket(bytes32 hash_rnd_number) public {
         // check if current lottery no -> ended
 
-        require(erc20.call(bytes4(keccak256("transferFrom(address, address, uint)")), msg.sender, this, 10));
+        require(erc20.transferFrom(msg.sender, address(this), 10));
         Ticket t;
         t.withdrawn = false;
         t.ticket_no =
@@ -72,16 +79,19 @@ contract BULOT {
     }
 
     function revealRndNumber(uint ticketno, uint rnd_number) public {
-        uint revealLotteryNo = getCurrentLotteryNo() - 1;
-        if(revealLotteryNo >= 0) {
+        
+        if(getCurrentLotteryNo() >= 1) {
+            
+            uint revealLotteryNo = getCurrentLotteryNo() - 1;
             bytes32 hash_rnd_number = sha3(rnd_number, msg.sender);
             Ticket t = lotteries[revealLotteryNo].tickets[ticketno];
+            
             if(t.hash_rnd_number == hash_rnd_number) {
                 t.owner = msg.sender;
                 // xor with new coming random number
                 lotteries[revealLotteryNo].winnerNumber ^= rnd_number;
                 lotteries[revealLotteryNo].validTickets[ticketno]=t;
-                lotteries[revealLotteryNo].numOfValidTickets++;
+                lotteries[revealLotteryNo].numOfValidTickets+=1;
             }
         }
     }
@@ -137,6 +147,7 @@ contract BULOT {
         uint numOfWinners = logarithm2(M);
 
         uint P;
+        uint total;
         bytes32 hashed_winner = keccak256(lotteries[lottery_no].winnerNumber);
         // traverse all winners until the ticket asked comes
         // calculate P(i)
@@ -145,19 +156,19 @@ contract BULOT {
             M = M / 2;
             P += M;
             if(lotteries[lottery_no].validTickets[ticket_no].owner==lotteries[lottery_no].validTickets[uint(hashed_winner) % lotteries[lottery_no].numOfValidTickets].owner) {
-                return P;
+                total+=P;
             }
             hashed_winner = keccak256(hashed_winner);
         }
-        return 0;
+        return total;
     }
     function withdrawTicketPrize(uint lottery_no, uint ticket_no) public	{
       uint prize = checkIfTicketWon(lottery_no, ticket_no);
       require(prize > 0, "Sorry, your ticket didnt win");
 
-      // require(withdrawedTicketPrize)
+      //require(withdrawedTicketPrize)
 
-        // verifies the player hasn't withdrawn his prize
+// verifies the player hasn't withdrawn his prize
       require(lotteries[lottery_no].validTickets[ticket_no].withdrawn == false, "Prize for this ticket was already withdrawn");
 
 
@@ -165,6 +176,7 @@ contract BULOT {
       "Failed to transfer prize to your account.");
 
       lotteries[lottery_no].validTickets[ticket_no].withdrawn == true;
+
 
     }
     function getIthWinningTicket(uint i,	uint lottery_no) public view returns (uint ticket_no,uint amount) {
@@ -195,9 +207,15 @@ contract BULOT {
         
         
     }
+    function getValid(uint lottery_no) public view returns (uint valids) {
+        return lotteries[lottery_no].numOfValidTickets;   // return lottery_no that is in the purchase period
+    }
+    function getCurrentLotteryNo() public view returns (uint diff) {
+        return (now-start)/(1 minutes);   // return lottery_no that is in the purchase period
+    }
     // lottery no's start from 0
     // at a given time, one lottery is in purchase period, and the previous one is in the reveal period
-    function getCurrentLotteryNo() public view returns (uint lottery_no) {
+    function getCurrentLotteryNo2() public view returns (uint lottery_no) {
         return (now - start)/(1 weeks);   // return lottery_no that is in the purchase period
 
     }
