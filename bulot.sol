@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.26;
 
 import "./erc20.sol";
 
@@ -15,7 +15,6 @@ contract BULOT {
     }
 
     struct Lottery {
-        uint lottery_no;
         uint money_collected;
         uint winnerNumber;
         Ticket[] tickets;
@@ -34,25 +33,26 @@ contract BULOT {
     mapping(uint => Lottery) lotteries;
     uint start;
     uint lottery_no = 0;
+    address public contractaddr; 
 
+
+    // protects from random payments - fallback function
     function() public {
         revert();
     }
 
 
-    constructor() {
+    constructor(address conaddr) {
         Lottery l;
-        l.lottery_no = 0;
         l.money_collected = 0;
         l.start = now;
         l.stage = StageTypes.PURCHASE;
+        contractaddr = conaddr; 
 
         lotteries[0]=l;
 
         start = now;
-        address ercAddress = 0xCf19DeBf8359fd17bd36AdBd71869CA9E8E4FacC;
         
-        erc20 = EIP20(ercAddress);
     }
 
     // purchase: 1 2 3 4
@@ -66,12 +66,18 @@ contract BULOT {
 
     function buyTicket(bytes32 hash_rnd_number) public {
         // check if current lottery no -> ended
+        
+        EIP20 contractobj = EIP20(contractaddr); 
 
-        require(erc20.transferFrom(msg.sender, address(this), 10));
+        require(contractobj.transferFrom(msg.sender, address(this), 10), 'FAILED');
+       
         Ticket t;
         t.withdrawn = false;
-        t.ticket_no =
+        t.hash_rnd_number = hash_rnd_number;
+        t.owner = msg.sender;
+        t.ticket_no = lotteries[getCurrentLotteryNo()].tickets.length;
         lotteries[getCurrentLotteryNo()].tickets.push(t);
+        
 
         uint index = lotteries[getCurrentLotteryNo()].tickets.length - 1;
         lotteries[getCurrentLotteryNo()].usersTicketNos[msg.sender].push(index);
@@ -83,21 +89,23 @@ contract BULOT {
         if(getCurrentLotteryNo() >= 1) {
             
             uint revealLotteryNo = getCurrentLotteryNo() - 1;
-            bytes32 hash_rnd_number = sha3(rnd_number, msg.sender);
+            bytes32 hash_rnd_number = sha3(rnd_number);
             Ticket t = lotteries[revealLotteryNo].tickets[ticketno];
+            require(t.owner == msg.sender); 
             
-            if(t.hash_rnd_number == hash_rnd_number) {
-                t.owner = msg.sender;
-                // xor with new coming random number
-                lotteries[revealLotteryNo].winnerNumber ^= rnd_number;
-                lotteries[revealLotteryNo].validTickets[ticketno]=t;
-                lotteries[revealLotteryNo].numOfValidTickets+=1;
-            }
+            require(t.hash_rnd_number == hash_rnd_number);
+            // xor with new coming random number
+            lotteries[revealLotteryNo].winnerNumber ^= rnd_number;
+            lotteries[revealLotteryNo].validTickets[ticketno]=t;
+            lotteries[revealLotteryNo].numOfValidTickets+=1;
         }
     }
     function getLastBoughtTicketNo(uint lottery_no) public view returns(uint) {
         uint index = lotteries[lottery_no].usersTicketNos[msg.sender].length - 1;
         return lotteries[lottery_no].usersTicketNos[msg.sender][index];
+    }
+    function getHash(uint rnd_number) public view returns(bytes32) {
+        return keccak256(rnd_number);
     }
     function getIthBoughtTicketNo(uint i,uint lottery_no) public view returns(uint) {
         return lotteries[lottery_no].usersTicketNos[msg.sender][i];
@@ -144,6 +152,7 @@ contract BULOT {
         // total amount of money collected in that lottery
         uint M = lotteries[lottery_no].money_collected;
 
+        // number of winners is equal to logarithm of the total money
         uint numOfWinners = logarithm2(M);
 
         uint P;
@@ -163,17 +172,17 @@ contract BULOT {
         return total;
     }
     function withdrawTicketPrize(uint lottery_no, uint ticket_no) public	{
+        EIP20 contractobj = EIP20(contractaddr); 
       uint prize = checkIfTicketWon(lottery_no, ticket_no);
       require(prize > 0, "Sorry, your ticket didnt win");
 
       //require(withdrawedTicketPrize)
 
-// verifies the player hasn't withdrawn his prize
-      require(lotteries[lottery_no].validTickets[ticket_no].withdrawn == false, "Prize for this ticket was already withdrawn");
+    // verifies the player hasn't withdrawn his prize
+    require(lotteries[lottery_no].validTickets[ticket_no].withdrawn == false, "Prize for this ticket was already withdrawn");
 
 
-      require(erc20.call(bytes4(keccak256("transfer(address, uint)")), msg.sender, prize),
-      "Failed to transfer prize to your account.");
+      require(contractobj.transfer(msg.sender, prize), "Failed to transfer prize to your account.");
 
       lotteries[lottery_no].validTickets[ticket_no].withdrawn == true;
 
