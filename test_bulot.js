@@ -22,6 +22,7 @@ loadScript("bulotabi.js");
 
 var bulotAddress = "0xCdE434211ed04ccf9B6ce83344E8410fFBDF5D43";
 var erc20Contract = web3.eth.contract(erc20Abi).at("0xe8c6f4161F9959C5B02117C35C5dA92b9BCfB717");
+
 var bulotContract = web3.eth.contract(bulotAbi).at(bulotAddress);
 
 console.log("CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
@@ -107,16 +108,16 @@ var revealCheck = setInterval(function () {
         } 
     }
 }, 30 * 1000);
+
 console.log("REVEAL END");
 
 console.log("WITHDRAW BEGIN");
 var withdrawCheck = setInterval(function () {
     console.log("Withdraw Period!!");
-
     console.log("WITHDRAW CHECK CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
     //console.log("type of lot no", typeof bulotContract.getCurrentLotteryNo.call());
     if (bulotContract.getCurrentLotteryNo.call()==2) { 
-	console.log("INSIDE WITHDRAW");
+      console.log("INSIDE WITHDRAW");
         for(var i=0; i<ACCOUNT_NUM; i++) {
 	    console.log("withdraw for account ", i);
             personal.unlockAccount(eth.accounts[i], "");
@@ -143,6 +144,7 @@ var withdrawCheck = setInterval(function () {
     } else {
         console.log("Withdraw stage has not come yet!!")
     }
+
 
 }, 40 * 1000);
 console.log("WITHDRAW END");
