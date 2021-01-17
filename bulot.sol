@@ -30,22 +30,15 @@ contract BULOT {
         mapping(uint => Ticket) validTickets;
         // number of valid ticket in this lottery
         uint numOfValidTickets;
-        uint start;
-        StageTypes stage;
         // maps user addresses to unique numbers of the tickets they purchased
         mapping(address => uint[]) usersTicketNos;
     }
-    // tickets: 0    1 2 3 4
-    //          a    b a
-    // usersTicketNos a -> 0,2
-    // b -> 1
     uint stagePeriod = 2 weeks;
-    enum StageTypes {PURCHASE, REVEAL}
     // maps lotteries from their number to itself
     mapping(uint => Lottery) lotteries;
     // timestamp for creation of the lottery
     uint start;
-    uint lottery_no = 0;
+    //uint lottery_no = 0;
     // address of the ERC contract
     address public contractaddr; 
 
@@ -57,31 +50,14 @@ contract BULOT {
 
     // constructor of the contract initializes address and the timestamp
     constructor(address conaddr) {
-        Lottery l;
-        l.money_collected = 0;
-        l.start = now;
-        l.stage = StageTypes.PURCHASE;
         contractaddr = conaddr; 
-
-        lotteries[0]=l;
 
         start = now;
         
     }
 
-    // purchase: 1 2 3 4
-    // reveal: 1 2 3
-    // winner: (1,2,3)
-
-    // buy
-    // reveal
-    // decide winners
-    // withdrawTicketPrize
-
     // function enables user to buy ticket
     function buyTicket(bytes32 hash_rnd_number) public {
-        // check if current lottery no -> ended
-        
         // enable connection
         EIP20 contractobj = EIP20(contractaddr); 
 
@@ -187,7 +163,6 @@ contract BULOT {
         uint numOfWinners = logarithm2(M);
 
         uint P;
-        uint total;
         // hashed function of the random number of the winner of this lottery
         bytes32 hashed_winner = keccak256(lotteries[lottery_no].winnerNumber);
         // traverse all winners until the ticket asked comes
