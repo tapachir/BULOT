@@ -20,8 +20,8 @@ function transferEthers(fromacc, toacc, amount) {
 loadScript("erc20abi.js");
 loadScript("bulotabi.js");
 
-var bulotAddress = "0x1655c8c22Fb095F359654681002E82c03C4674e2";
-var erc20Contract = web3.eth.contract(erc20Abi).at("0x472FDE01FB590D5914719C30eD92E2C88Ba0366b");
+var bulotAddress = "0xCdE434211ed04ccf9B6ce83344E8410fFBDF5D43";
+var erc20Contract = web3.eth.contract(erc20Abi).at("0xe8c6f4161F9959C5B02117C35C5dA92b9BCfB717");
 var bulotContract = web3.eth.contract(bulotAbi).at(bulotAddress);
 
 console.log("CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
@@ -138,8 +138,8 @@ var withdrawCheck = setInterval(function () {
 		}
             }
         }
-        clearInterval(revealInterval);
         clearInterval(revealCheck);
+        clearInterval(withdrawCheck);
     } else {
         console.log("Withdraw stage has not come yet!!")
     }
