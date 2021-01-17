@@ -40,7 +40,6 @@ contract BULOT {
     uint unusedVar = 1;
     // timestamp for creation of the lottery
     uint start;
-    //uint lottery_no = 0;
     // address of the ERC contract
     address public contractaddr; 
 
