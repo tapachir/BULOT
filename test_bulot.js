@@ -20,8 +20,8 @@ function transferEthers(fromacc, toacc, amount) {
 loadScript("erc20abi.js");
 loadScript("bulotabi.js");
 
-var bulotAddress = "0x6434B5bF95EB32edCe4CBAc209be13af2DE70aEF";
-var erc20Contract = web3.eth.contract(erc20Abi).at("0x5D1f999570205C5e28b243c215c63d18E915ed93");
+var bulotAddress = "0x3840E3F344bBeF197D796b37Ec56DAff14E739a6";
+var erc20Contract = web3.eth.contract(erc20Abi).at("0x869D5a8903C22C9D61A4Da74462658702C303377");
 var bulotContract = web3.eth.contract(bulotAbi).at(bulotAddress);
 
 console.log("CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
@@ -112,28 +112,20 @@ console.log("REVEAL END");
 console.log("WITHDRAW BEGIN");
 var withdrawCheck = setInterval(function () {
     console.log("Withdraw Period!!");
-
     console.log("WITHDRAW CHECK CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
-    console.log("type of lot no", typeof bulotContract.getCurrentLotteryNo.call());
     if (bulotContract.getCurrentLotteryNo.call()==2) { 
 	console.log("INSIDE WITHDRAW");
+  var j=1;
         for(var i=0; i<ACCOUNT_NUM; i++) {
-	    console.log("withdraw for account ", i);
-            personal.unlockAccount(eth.accounts[i], "");
-            // This is how log2 is taken in geth console ???
-	    var logOfMoney = Math.log(ACCOUNT_NUM*10) / Math.log(2);
-            for (var j = 0; j < Math.ceil(logOfMoney); j++) { 
-                var award = bulotNetwork.checkIfTicketWon(0, i, {from: eth.accounts[i]});
+            var award = bulotContract.checkIfTicketWon.call(0, i, {from: eth.accounts[i]});
                 if (award > 0) {
                     console.log("Account ", i ," won ", award," CONGRATS!! She is ", j," th winner:)");
+                    personal.unlockAccount(eth.accounts[i], "");
                     bulotContract.withdrawTicketPrize(0, i, {from: eth.accounts[i]});
+                    j++;
                 }
-		else {
-		    console.log("Sorry, account ", i ," did not win. Maybe next time!");
-		}
             }
-        }
-        clearInterval(revealInterval);
+        //clearTimeout(withdrawCheck);
         clearInterval(revealCheck);
     } else {
         console.log("Withdraw stage has not come yet!!")
@@ -141,3 +133,6 @@ var withdrawCheck = setInterval(function () {
 
 }, 50 * 1000);
 console.log("WITHDRAW END");
+
+        
+        
