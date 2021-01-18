@@ -20,9 +20,8 @@ function transferEthers(fromacc, toacc, amount) {
 loadScript("erc20abi.js");
 loadScript("bulotabi.js");
 
-var bulotAddress = "0xCdE434211ed04ccf9B6ce83344E8410fFBDF5D43";
-var erc20Contract = web3.eth.contract(erc20Abi).at("0xe8c6f4161F9959C5B02117C35C5dA92b9BCfB717");
-
+var bulotAddress = "0x25f7d1827347780458E41E815Ab7dffFC750A053";
+var erc20Contract = web3.eth.contract(erc20Abi).at("0x2D1C5154FAa6BbE92f42bd9805b4A2eBFcb8195a");
 var bulotContract = web3.eth.contract(bulotAbi).at(bulotAddress);
 
 console.log("CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
@@ -108,43 +107,31 @@ var revealCheck = setInterval(function () {
         } 
     }
 }, 30 * 1000);
-
 console.log("REVEAL END");
 
 console.log("WITHDRAW BEGIN");
 var withdrawCheck = setInterval(function () {
-    console.log("Withdraw Period!!");
-    console.log("WITHDRAW CHECK CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
-    //console.log("type of lot no", typeof bulotContract.getCurrentLotteryNo.call());
-    if (bulotContract.getCurrentLotteryNo.call()==2) { 
-      console.log("INSIDE WITHDRAW");
-        for(var i=0; i<ACCOUNT_NUM; i++) {
-	    console.log("withdraw for account ", i);
-            personal.unlockAccount(eth.accounts[i], "");
-	    console.log("account is unlocked ", i);
-            // This is how log2 is taken in geth console ???
-	    var logOfMoney = Math.log(ACCOUNT_NUM*10) / Math.log(2);
-	    console.log("logOfMoney ", logOfMoney);
-	    console.log("Math.ceil(logOfMoney) ", Math.ceil(logOfMoney));
-            for (var j = 0; j < Math.ceil(logOfMoney); j++) { 
-	    	console.log("inside inner for loop, j is ", j);
-                var award = bulotContract.checkIfTicketWon.call(0, i, {from: eth.accounts[i]});
-	    	console.log("award is ", award);
-                if (award > 0) {
-                    console.log("Account ", i ," won ", award," CONGRATS!! She is ", j," th winner:)");
-                    bulotContract.withdrawTicketPrize(0, i, {from: eth.accounts[i]});
-                }
-		else {
-		    console.log("Sorry, account ", i ," did not win. Maybe next time!");
-		}
-            }
-        }
-        clearInterval(revealCheck);
-        clearInterval(withdrawCheck);
-    } else {
-        console.log("Withdraw stage has not come yet!!")
-    }
+	console.log("Withdraw Period!!");
 
+	console.log("WITHDRAW CHECK CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
+	if (bulotContract.getCurrentLotteryNo.call()==2) { 
+		console.log("INSIDE WITHDRAW");
+		var j = 1;
+		for(var i=0; i<ACCOUNT_NUM; i++) {
+			personal.unlockAccount(eth.accounts[i], "");
+			var award = bulotContract.checkIfTicketWon.call(0, i, {from: eth.accounts[i]});
+			console.log("award is ", award);
+			if (award > 0) {
+				console.log("Account ", i ," won ", award," CONGRATS!!");
+				bulotContract.withdrawTicketPrize(0, i, {from: eth.accounts[i]});
+				j++;
+			}
+		}
+		clearInterval(revealCheck);
+		clearInterval(withdrawCheck);
+	} else {
+        	console.log("Withdraw stage has not come yet!!")
+    	}
 
 }, 40 * 1000);
 console.log("WITHDRAW END");
