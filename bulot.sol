@@ -216,20 +216,11 @@ contract BULOT {
             }
             hashed_winner = keccak256(hashed_winner);
         }
-        
-        
-    }
-    function getValid(uint lottery_no) public view returns (uint valids) {
-        return lotteries[lottery_no].numOfValidTickets;   // return lottery_no that is in the purchase period
-    }
-    function getCurrentLotteryNo() public view returns (uint diff) {
-        return (block.timestamp-start)/(1 minutes);   // return lottery_no that is in the purchase period
     }
     // lottery no's start from 0
     // at a given time, one lottery is in purchase period, and the previous one is in the reveal period
-    function getCurrentLotteryNo2() public view returns (uint lottery_no) {
+    function getCurrentLotteryNo() public view returns (uint lottery_no) {
         return (block.timestamp - start)/(1 weeks);   // return lottery_no that is in the purchase period
-
     }
     // returns total money in the given lottery
     function getMoneyCollected(uint lottery_no) public view returns (uint amount) {
