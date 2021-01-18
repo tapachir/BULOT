@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.26;
 
 import "./erc20.sol";
 
@@ -33,9 +33,11 @@ contract BULOT {
         // maps user addresses to unique numbers of the tickets they purchased
         mapping(address => uint[]) usersTicketNos;
     }
-   
     // maps lotteries from their number to itself
     mapping(uint => Lottery) lotteries;
+    // unusedVar is not used in the code, but without it, lottery number calculation did not work.
+    // so, we keep it
+    uint unusedVar = 1;
     // timestamp for creation of the lottery
     uint start;
     // address of the ERC contract
@@ -57,7 +59,8 @@ contract BULOT {
     function buyTicket(bytes32 hash_rnd_number) public {
         // enable connection
         EIP20 contractobj = EIP20(contractaddr); 
-        // transaction has to be completed before prchasing
+
+        // transaction has to be completed before purchasing
         require(contractobj.transferFrom(msg.sender, address(this), 10), 'FAILED');
        
        // ticket object creation
@@ -77,24 +80,25 @@ contract BULOT {
     }
 
     function revealRndNumber(uint ticketno, uint rnd_number) public {
+        
         // check if this is the time for any lottery to reveal
-        if(getCurrentLotteryNo() >= 1) {
-            // only last week's lottery can be revealed
-            uint revealLotteryNo = getCurrentLotteryNo() - 1;
-            // take the hash of the coming number to calculate
-            bytes32 hash_rnd_number = sha3(rnd_number);
-            Ticket t = lotteries[revealLotteryNo].tickets[ticketno];
-            // check whether the senders are the same
-            require(t.owner == msg.sender); 
+        require(getCurrentLotteryNo() >= 1);
             
-            // check the hash number sent in purchase is same of this one
-            require(t.hash_rnd_number == hash_rnd_number);
-            // xor with new coming random number
-            lotteries[revealLotteryNo].winnerNumber ^= rnd_number;
-            // add as valid ticket and increment valid tickets
-            lotteries[revealLotteryNo].validTickets[ticketno]=t;
-            lotteries[revealLotteryNo].numOfValidTickets+=1;
-        }
+        // only last week's lottery can be revealed
+        uint revealLotteryNo = getCurrentLotteryNo() - 1;
+        // take the hash of the coming number to calculate
+        bytes32 hash_rnd_number = sha3(rnd_number, msg.sender);
+        Ticket t = lotteries[revealLotteryNo].tickets[ticketno];
+        // check whether the senders are the same
+        require(t.owner == msg.sender); 
+        
+        // check the hash number sent in purchase is same of this one
+        require(t.hash_rnd_number == hash_rnd_number);
+        // xor with new coming random number
+        lotteries[revealLotteryNo].winnerNumber ^= rnd_number;
+        // add as valid ticket and increment valid tickets
+        lotteries[revealLotteryNo].validTickets[ticketno]=t;
+        lotteries[revealLotteryNo].numOfValidTickets+=1;
     }
     function getLastBoughtTicketNo(uint lottery_no) public view returns(uint) {
         // take the last ticket bought by the user
@@ -143,8 +147,8 @@ contract BULOT {
         }
     }
     // checks whether the ticket is won or not
-    function checkIfTicketWon(uint lottery_no, uint ticket_no) public view returns (uint	amount) {
-        // get current lottary number to compare
+    function checkIfTicketWon(uint lottery_no, uint ticket_no) public view returns (uint amount) {
+        // get current lottery number to compare
         uint currentLotteryNo = getCurrentLotteryNo();
 
         // lottery has to be finished already in order to check whether the ticket won or not
@@ -156,41 +160,38 @@ contract BULOT {
         // number of winners is equal to logarithm of the total money
         uint numOfWinners = logarithm2(M);
 
-        uint P;
-        // hashed function of the random number of the winner of this lottery
-        bytes32 hashed_winner = keccak256(lotteries[lottery_no].winnerNumber);
-        // traverse all winners until the ticket asked comes
-        // calculate P(i)
-        for(uint i=0; i <= numOfWinners; i++) {
-            // calculate prize as mentioned 
-            P = M % 2;
-            M = M / 2;
-            P += M;
-            // check the ticket no matches or not
-            if(ticket_no== (uint(hashed_winner) % lotteries[lottery_no].numOfValidTickets)) {
-                return P;
+        uint total = 0;
+        
+        // compare this ticket with ith winning ticket for all i = 1...ceil(log M)
+        for(uint i=1; i<=numOfWinners; i++) {
+            var (winning_ticket_no, winning_amount) = getIthWinningTicket(i, lottery_no);
+            if (winning_ticket_no == ticket_no) {
+                total += winning_amount;
             }
-            hashed_winner = keccak256(hashed_winner);
         }
-        // this ticket has no  prize
-        return 0;
+        // total prize that this ticket has won
+        return total;
     }
-    // user cna take the prize by this function
+    // user can take the prize by this function
     function withdrawTicketPrize(uint lottery_no, uint ticket_no) public	{
         // create connection
-        EIP20 contractobj = EIP20(contractaddr); 
+        EIP20 contractobj = EIP20(contractaddr);
+        
         // before check the ticket has won anything
         uint prize = checkIfTicketWon(lottery_no, ticket_no);
+        
         require(prize > 0, "Sorry, your ticket didnt win");
 
         // verifies the player hasn't withdrawn his prize
         require(lotteries[lottery_no].validTickets[ticket_no].withdrawn == false, "Prize for this ticket was already withdrawn");
 
         require(contractobj.transfer(msg.sender, prize), "Failed to transfer prize to your account.");
+        
         // label it as withdrawn after all process is done
         lotteries[lottery_no].validTickets[ticket_no].withdrawn == true;
     }
-    function getIthWinningTicket(uint i,	uint lottery_no) public view returns (uint ticket_no,uint amount) {
+    
+    function getIthWinningTicket(uint i, uint lottery_no) public view returns (uint ticket_no, uint amount) {
         // get current lottary number to compare 
         uint currentLotteryNo = getCurrentLotteryNo();
         
@@ -201,7 +202,7 @@ contract BULOT {
         uint M = lotteries[lottery_no].money_collected;
         
         uint numOfWinners = logarithm2(M);
-        require(i <= numOfWinners); // < or <= ??
+        require(i <= numOfWinners);
         
         uint P;
         bytes32 hashed_winner = keccak256(lotteries[lottery_no].winnerNumber);
@@ -215,6 +216,11 @@ contract BULOT {
             }
             hashed_winner = keccak256(hashed_winner);
         }
+        
+        
+    }
+    function getValid(uint lottery_no) public view returns (uint valids) {
+        return lotteries[lottery_no].numOfValidTickets;   // return lottery_no that is in the purchase period
     }
     function getCurrentLotteryNo() public view returns (uint diff) {
         return (block.timestamp-start)/(1 minutes);   // return lottery_no that is in the purchase period

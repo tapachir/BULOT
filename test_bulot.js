@@ -20,8 +20,10 @@ function transferEthers(fromacc, toacc, amount) {
 loadScript("erc20abi.js");
 loadScript("bulotabi.js");
 
-var bulotAddress = "0x9cE37e3fF8e3d9E1816501a91620906f4016c825";
-var erc20Contract = web3.eth.contract(erc20Abi).at("0x869D5a8903C22C9D61A4Da74462658702C303377");
+
+var bulotAddress = "0x25f7d1827347780458E41E815Ab7dffFC750A053";
+var erc20Contract = web3.eth.contract(erc20Abi).at("0x2D1C5154FAa6BbE92f42bd9805b4A2eBFcb8195a");
+
 var bulotContract = web3.eth.contract(bulotAbi).at(bulotAddress);
 
 console.log("CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
@@ -106,33 +108,33 @@ var revealCheck = setInterval(function () {
             console.log("Reveal stage has not come yet!!")
         } 
     }
-}, 40 * 1000);
+}, 30 * 1000);
 console.log("REVEAL END");
 
 console.log("WITHDRAW BEGIN");
 var withdrawCheck = setInterval(function () {
-    console.log("Withdraw Period!!");
-    console.log("WITHDRAW CHECK CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
-    if (bulotContract.getCurrentLotteryNo.call()==2) { 
-	console.log("INSIDE WITHDRAW");
-  
-        for(var i=0; i<ACCOUNT_NUM; i++) {
-            var award = bulotContract.checkIfTicketWon.call(0, i, {from: eth.accounts[i]});
-                if (award > 0) {
-                    console.log("Account ", i ," won ", award," CONGRATS!!");
-                    personal.unlockAccount(eth.accounts[i], "");
-                    bulotContract.withdrawTicketPrize(0, i, {from: eth.accounts[i]});
-                    
-                }
-            }
-        //clearTimeout(withdrawCheck);
-        clearInterval(revealCheck);
-    } else {
-        console.log("Withdraw stage has not come yet!!")
-    }
 
-}, 50 * 1000);
+	console.log("Withdraw Period!!");
+
+	console.log("WITHDRAW CHECK CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
+	if (bulotContract.getCurrentLotteryNo.call()==2) { 
+		console.log("INSIDE WITHDRAW");
+		var j = 1;
+		for(var i=0; i<ACCOUNT_NUM; i++) {
+			personal.unlockAccount(eth.accounts[i], "");
+			var award = bulotContract.checkIfTicketWon.call(0, i, {from: eth.accounts[i]});
+			console.log("award is ", award);
+			if (award > 0) {
+				console.log("Account ", i ," won ", award," CONGRATS!!");
+				bulotContract.withdrawTicketPrize(0, i, {from: eth.accounts[i]});
+				j++;
+			}
+		}
+		clearInterval(revealCheck);
+		clearInterval(withdrawCheck);
+	} else {
+        	console.log("Withdraw stage has not come yet!!")
+    	}
+
+}, 40 * 1000);
 console.log("WITHDRAW END");
-
-        
-        
