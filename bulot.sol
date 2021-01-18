@@ -82,24 +82,23 @@ contract BULOT {
     function revealRndNumber(uint ticketno, uint rnd_number) public {
         
         // check if this is the time for any lottery to reveal
-        if(getCurrentLotteryNo() >= 1) {
+        require(getCurrentLotteryNo() >= 1);
             
-            // only last week's lottery can be revealed
-            uint revealLotteryNo = getCurrentLotteryNo() - 1;
-            // take the hash of the coming number to calculate
-            bytes32 hash_rnd_number = sha3(rnd_number);
-            Ticket t = lotteries[revealLotteryNo].tickets[ticketno];
-            // check whether the senders are the same
-            require(t.owner == msg.sender); 
-            
-            // check the hash number sent in purchase is same of this one
-            require(t.hash_rnd_number == hash_rnd_number);
-            // xor with new coming random number
-            lotteries[revealLotteryNo].winnerNumber ^= rnd_number;
-            // add as valid ticket and increment valid tickets
-            lotteries[revealLotteryNo].validTickets[ticketno]=t;
-            lotteries[revealLotteryNo].numOfValidTickets+=1;
-        }
+        // only last week's lottery can be revealed
+        uint revealLotteryNo = getCurrentLotteryNo() - 1;
+        // take the hash of the coming number to calculate
+        bytes32 hash_rnd_number = sha3(rnd_number, msg.sender);
+        Ticket t = lotteries[revealLotteryNo].tickets[ticketno];
+        // check whether the senders are the same
+        require(t.owner == msg.sender); 
+        
+        // check the hash number sent in purchase is same of this one
+        require(t.hash_rnd_number == hash_rnd_number);
+        // xor with new coming random number
+        lotteries[revealLotteryNo].winnerNumber ^= rnd_number;
+        // add as valid ticket and increment valid tickets
+        lotteries[revealLotteryNo].validTickets[ticketno]=t;
+        lotteries[revealLotteryNo].numOfValidTickets+=1;
     }
     function getLastBoughtTicketNo(uint lottery_no) public view returns(uint) {
         // take the last ticket bought by the user
