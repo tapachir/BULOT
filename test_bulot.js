@@ -20,11 +20,8 @@ function transferEthers(fromacc, toacc, amount) {
 loadScript("erc20abi.js");
 loadScript("bulotabi.js");
 
-var bulotAddress = "0x8Ffc5B486c88e751E6d72ec95FC97b914Cb63Ae3";
-var erc20Contract = web3.eth.contract(erc20Abi).at("0xAE544D99592AC6cF2170D09cB7f848d7A65B5dB0");
-
-var bulotAddress = "0x25f7d1827347780458E41E815Ab7dffFC750A053";
-var erc20Contract = web3.eth.contract(erc20Abi).at("0x2D1C5154FAa6BbE92f42bd9805b4A2eBFcb8195a");
+var bulotAddress = "0x20a0dF9445E05ec9Df1223b90af2c95235E15851";
+var erc20Contract = web3.eth.contract(erc20Abi).at("0x4fD98d40c34f26A65D800740bbB9043620D56EAA");
 
 var bulotContract = web3.eth.contract(bulotAbi).at(bulotAddress);
 
@@ -37,6 +34,7 @@ if(accountCount < ACCOUNT_NUM) {
 
 // coinbase is 0th account 
 // send ethers to all accounts from 0th account
+// for gas costs
 personal.unlockAccount(eth.accounts[0], "", 5000000);
 for(var i=1; i<ACCOUNT_NUM; i++) {
 	transferEthers(eth.accounts[0], eth.accounts[i], 10);
@@ -51,7 +49,7 @@ for(var i=0; i<ACCOUNT_NUM; i++) {
 // send tokens
 transferTokens();
 
-
+// in order to pass time, cretaing blocks always
 var dummyInterval = setInterval(function () { 
 
     personal.unlockAccount(eth.accounts[1], '');
@@ -63,11 +61,11 @@ var dummyInterval = setInterval(function () {
     transferEthers(eth.accounts[0], eth.accounts[1], 10);
     //console.log("DUMMY INTERVAL sent from 0");
 }, 600);
-
+// holds numbers given by participants
 var user_nums = new Array();
 
 var str1;
-  // buy ticket
+  // buying tickets stage
 for(var i=0; i<ACCOUNT_NUM; i++) {
 	erc20Contract.transfer(eth.accounts[i], 10, {from: eth.accounts[0]});
 	personal.unlockAccount(eth.accounts[i], '');
@@ -79,9 +77,10 @@ for(var i=0; i<ACCOUNT_NUM; i++) {
   //ticketNos.set(eth.accounts[i], bulotContract.getLastBoughtTicketNo(0));
 	console.log("Account: ",i," is buying a ticket!");
 }
-
+// total money collected in lottery
 console.log("LOTTERY COLLECTED ",bulotContract.getMoneyCollected.call(0)," IN TOTAL!");
-
+// bool to make possible reveal stage occurs only once
+// reveal stage occurs every 30 seconds
 var revealFlag = false;
 var revealCheck = setInterval(function () {
     if(!revealFlag){
@@ -97,9 +96,8 @@ var revealCheck = setInterval(function () {
         } 
     }
 }, 30 * 1000);
-
+// withdraw stage occurs every 40 seconds
 var withdrawCheck = setInterval(function () {
-    //console.log("type of lot no", typeof bulotContract.getCurrentLotteryNo.call());
     if (bulotContract.getCurrentLotteryNo.call()==2) { 
      
         for(var i=0; i<ACCOUNT_NUM; i++) {
@@ -110,32 +108,10 @@ var withdrawCheck = setInterval(function () {
                     bulotContract.withdrawTicketPrize(0, i, {from: eth.accounts[i]});
                 }
         }
+	console.log("LOTTERY ENDS~");
         clearInterval(revealCheck);
         clearInterval(withdrawCheck);
     } else {
         console.log("Withdraw stage has not come yet")
     }
-
-	console.log("Withdraw Period!!");
-
-	console.log("WITHDRAW CHECK CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
-	if (bulotContract.getCurrentLotteryNo.call()==2) { 
-		console.log("INSIDE WITHDRAW");
-		var j = 1;
-		for(var i=0; i<ACCOUNT_NUM; i++) {
-			personal.unlockAccount(eth.accounts[i], "");
-			var award = bulotContract.checkIfTicketWon.call(0, i, {from: eth.accounts[i]});
-			console.log("award is ", award);
-			if (award > 0) {
-				console.log("Account ", i ," won ", award," CONGRATS!!");
-				bulotContract.withdrawTicketPrize(0, i, {from: eth.accounts[i]});
-				j++;
-			}
-		}
-		clearInterval(revealCheck);
-		clearInterval(withdrawCheck);
-	} else {
-        	console.log("Withdraw stage has not come yet!!")
-    	}
-
 }, 40 * 1000);
