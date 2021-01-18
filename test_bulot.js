@@ -20,8 +20,10 @@ function transferEthers(fromacc, toacc, amount) {
 loadScript("erc20abi.js");
 loadScript("bulotabi.js");
 
+
 var bulotAddress = "0x25f7d1827347780458E41E815Ab7dffFC750A053";
 var erc20Contract = web3.eth.contract(erc20Abi).at("0x2D1C5154FAa6BbE92f42bd9805b4A2eBFcb8195a");
+
 var bulotContract = web3.eth.contract(bulotAbi).at(bulotAddress);
 
 console.log("CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
@@ -111,6 +113,7 @@ console.log("REVEAL END");
 
 console.log("WITHDRAW BEGIN");
 var withdrawCheck = setInterval(function () {
+
 	console.log("Withdraw Period!!");
 
 	console.log("WITHDRAW CHECK CURRENT LOT NO", bulotContract.getCurrentLotteryNo.call());
