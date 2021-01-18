@@ -108,7 +108,7 @@ contract BULOT {
     }
     // calculates the hash function of the given number
     function getHash(uint rnd_number) public view returns(bytes32) {
-        return keccak256(rnd_number);
+        return keccak256(rnd_number, msg.sender);
     }
     // returns the number of the ith ticket bought by the user who is calling this func
     function getIthBoughtTicketNo(uint i,uint lottery_no) public view returns(uint) {
