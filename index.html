@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>BULOT </title>
+  <script>
+    import Web3 from 'web3'
+export function setProvider () => {
+  if (window.ethereum) {
+    const ethereum = window.ethereum
+    const web3Provider = new Web3(ethereum)
+
+    /* make web3Provider available to your entire app now */
+  }
+}
+
+     window.addEventListener('load', function() {
+
+       var web3 = window.web3 ;
+
+       if (typeof web3 !== 'undefined') {
+         // Use Mist/MetaMask's provider
+        web3js = new Web3(web3.currentProvider);
+       } else {
+        console.log('No web3? You should consider trying MetaMask!')
+        // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+        web3js = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+      }
+     } ) ;
+
+    function generateHash() {
+        var fromaddr = document.getElementById("rndNum").value ;
+        rc = web3js.eth.getHash(fromaddr,function(error, result){
+                if(!error) {
+                   var stat = JSON.stringify(result);
+                   document.getElementById("status").innerHTML = "Balance:" + stat ;
+                }
+                else {
+                   console.error(error);
+                }
+            }) ;
+
+    }
+    function buyticket() {
+        var fromaddr = document.getElementById("fromaddr").value ;
+        rc = web3js.eth.getBalance(fromaddr,function(error, result){
+                if(!error) {
+                   var stat = JSON.stringify(result);
+                   document.getElementById("status").innerHTML = "Balance:" + stat ;
+                }
+                else {
+                   console.error(error);
+                }
+            }) ;
+
+    }
+    function revealNum() {
+        var fromaddr = document.getElementById("fromaddr").value ;
+        rc = web3js.eth.getBalance(fromaddr,function(error, result){
+                if(!error) {
+                   var stat = JSON.stringify(result);
+                   document.getElementById("status").innerHTML = "Balance:" + stat ;
+                }
+                else {
+                   console.error(error);
+                }
+            }) ;
+
+    }
+
+    function getaddrbalance() {
+        var fromaddr = document.getElementById("fromaddr").value ;
+        rc = web3js.eth.getBalance(fromaddr,function(error, result){
+                if(!error) {
+                   var stat = JSON.stringify(result);
+                   document.getElementById("status").innerHTML = "Balance:" + stat ;
+                }
+                else {
+                   console.error(error);
+                }
+            }) ;
+
+    }
+
+    function withdrawPrize() {
+        var fromaddr = document.getElementById("fromaddr").value ;
+        rc = web3js.eth.getBalance(fromaddr,function(error, result){
+                if(!error) {
+                   var stat = JSON.stringify(result);
+                   document.getElementById("status").innerHTML = "Balance:" + stat ;
+                }
+                else {
+                   console.error(error);
+                }
+            }) ;
+
+    }
+
+    function checkIfTicketWon() {
+        var fromaddr = document.getElementById("fromaddr").value ;
+        rc = web3js.eth.getBalance(fromaddr,function(error, result){
+                if(!error) {
+                   var stat = JSON.stringify(result);
+                   document.getElementById("status").innerHTML = "Balance:" + stat ;
+                }
+                else {
+                   console.error(error);
+                }
+            }) ;
+
+    }
+  </script>
+</head>
+<body>
+
+
+
+
+<div class="form-style-10">
+<h1>BULOT!<span>BUY A TICKET AND GET A CHANCE TO WIN</span></h1>
+<form>
+
+    <div class="section"><span></span>BUYING TICKET</div>
+    <div class="inner-wrap">
+      <div class="pull-right">
+        <label>GENERATE HASH WITH RANDOM NUMBER <textarea id="rndNum" name="field1"></textarea></label>
+        <button onclick="generateHash()">Generate </button>
+        <p id="random"></p>
+
+        <br>
+        <br>
+
+        <label>BUY TICKET WITH HASH <textarea id="rndHash" name="field2"></textarea></label>
+        <button onclick="buyticket()">BUY </button>
+        <p id="successfullyBought"></p>
+
+
+    </div>
+<br>
+<br>
+<br>
+<br>
+
+
+
+    <div class="section"><span></span>REVEAL AND CHECK</div>
+    <div class="inner-wrap">
+      <label>REVEAL YOUR RANDOM NUMBER <textarea id="rndNumRev" name="field3"></textarea></label>
+      <button onclick="revealNum()">REVEAL </button>
+      <p id="revealSuccess"></p>
+
+      <br>
+      <br>
+
+      <label>CHECK IF YOUR TICKET WON <textarea id="ticketNum" name="field4"></textarea></label>
+      <button onclick="checkIfTicketWon()">CHECK </button>
+      <p id="checkWon"></p>
+
+
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+
+    <div class="section"><span></span>WITHDRAW PRIZE</div>
+        <div class="inner-wrap">
+          <label>WITHDRAW YOUR PRIZE <textarea id="ticketNumWi" name="field5"></textarea></label>
+          <button onclick="withdrawPrize()">withdraw </button>
+          <p id="withdrawSuccess"></p>
+
+    </div>
+    <div class="section"><span></span>GET TOKEN BALANCE </div>
+        <div class="inner-wrap">
+          <label>WITHDRAW YOUR PRIZE <textarea id="addressForBalance" name="field6"></textarea></label>
+          <button onclick="getBalance()">withdraw </button>
+          <p id="balance"></p>
+
+    </div>
+    </div>
+
+
+
+</form>
+</div>
+
+
+</body>
+<link href="default.css" rel="stylesheet" type="text/css"/>
+
+</html>
