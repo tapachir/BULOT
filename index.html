@@ -2,37 +2,637 @@
 <html lang="en">
 <head>
   <title>BULOT </title>
+
+
+  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.34/dist/web3.min.js"></script>
+
   <script>
-    import Web3 from 'web3'
-export function setProvider () => {
-  if (window.ethereum) {
-    const ethereum = window.ethereum
-    const web3Provider = new Web3(ethereum)
+     // window.addEventListener('load', function() {
+     //
+     //
+     //
+     //
+     //   //var web3 = window.web3 ;
+     //   if (window.ethereum) {
+     //     window.web3 = new Web3(window.ethereum);
+     //     window.ethereum.enable();
+     //     console.log('success')
+     //
+     //   }
+     //
+     //   else {
+     //     console.log('failure')
+     //
+     //   }
+     //   if (typeof web3 !== 'undefined') {
+     //     // Use Mist/MetaMask's provider
+     //    web3 = new Web3(web3.currentProvider);
+     //   } else {
+     //    console.log('No web3? You should consider trying MetaMask!')
+     //    // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+     //    web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+     //
+     //  }
+     //
+     // } ) ;
+     window.addEventListener('load', async () => {
+    // Modern dapp browsers...
+    if (window.ethereum) {
+                console.log("Modern dapp");
+                window.ethereum.enable().then(function (accounts) {
+                    currentAccount = accounts[0];
+                    document.getElementById("currentAccount").innerHTML = currentAccount;
+                    console.log("Current account: " + currentAccount);
+                }).catch(function (reason) {
+                    console.log("User rejected access. Reason: " + reason);
+                });
 
-    /* make web3Provider available to your entire app now */
+                web3 = new Web3(ethereum); }
+    // Legacy dapp browsers...
+    else if (window.web3) {
+        web3 = new Web3(web3.currentProvider);
+    }
+    // Non-dapp browsers...
+    else {
+        alert('Non-Ethereum browser detected. You should consider trying MetaMask!');
+    }
+
+  } ) ;
+
+     var contractAddressToken = '0xe2F5dDbf0Ee65C7E24F2d8E1AA072e662C09a873';
+     var contractAddressBULOT ='0xE4eF5599D8650c288D6Db0c1476f3357f4AC4Dc0';
+     var abiBulotRaw= [
+     	{
+     		"constant": false,
+     		"inputs": [
+     			{
+     				"name": "hash_rnd_number",
+     				"type": "bytes32"
+     			}
+     		],
+     		"name": "buyTicket",
+     		"outputs": [],
+     		"payable": false,
+     		"stateMutability": "nonpayable",
+     		"type": "function"
+     	},
+     	{
+     		"constant": false,
+     		"inputs": [
+     			{
+     				"name": "ticketno",
+     				"type": "uint256"
+     			},
+     			{
+     				"name": "rnd_number",
+     				"type": "uint256"
+     			}
+     		],
+     		"name": "revealRndNumber",
+     		"outputs": [],
+     		"payable": false,
+     		"stateMutability": "nonpayable",
+     		"type": "function"
+     	},
+     	{
+     		"constant": false,
+     		"inputs": [
+     			{
+     				"name": "lottery_no",
+     				"type": "uint256"
+     			},
+     			{
+     				"name": "ticket_no",
+     				"type": "uint256"
+     			}
+     		],
+     		"name": "withdrawTicketPrize",
+     		"outputs": [],
+     		"payable": false,
+     		"stateMutability": "nonpayable",
+     		"type": "function"
+     	},
+     	{
+     		"inputs": [
+     			{
+     				"name": "conaddr",
+     				"type": "address"
+     			}
+     		],
+     		"payable": false,
+     		"stateMutability": "nonpayable",
+     		"type": "constructor"
+     	},
+     	{
+     		"payable": false,
+     		"stateMutability": "nonpayable",
+     		"type": "fallback"
+     	},
+     	{
+     		"constant": true,
+     		"inputs": [
+     			{
+     				"name": "lottery_no",
+     				"type": "uint256"
+     			},
+     			{
+     				"name": "ticket_no",
+     				"type": "uint256"
+     			}
+     		],
+     		"name": "checkIfTicketWon",
+     		"outputs": [
+     			{
+     				"name": "amount",
+     				"type": "uint256"
+     			}
+     		],
+     		"payable": false,
+     		"stateMutability": "view",
+     		"type": "function"
+     	},
+     	{
+     		"constant": true,
+     		"inputs": [],
+     		"name": "contractaddr",
+     		"outputs": [
+     			{
+     				"name": "",
+     				"type": "address"
+     			}
+     		],
+     		"payable": false,
+     		"stateMutability": "view",
+     		"type": "function"
+     	},
+     	{
+     		"constant": true,
+     		"inputs": [],
+     		"name": "getCurrentLotteryNo",
+     		"outputs": [
+     			{
+     				"name": "lottery_no",
+     				"type": "uint256"
+     			}
+     		],
+     		"payable": false,
+     		"stateMutability": "view",
+     		"type": "function"
+     	},
+     	{
+     		"constant": true,
+     		"inputs": [
+     			{
+     				"name": "rnd_number",
+     				"type": "uint256"
+     			}
+     		],
+     		"name": "getHash",
+     		"outputs": [
+     			{
+     				"name": "",
+     				"type": "bytes32"
+     			}
+     		],
+     		"payable": false,
+     		"stateMutability": "view",
+     		"type": "function"
+     	},
+     	{
+     		"constant": true,
+     		"inputs": [
+     			{
+     				"name": "i",
+     				"type": "uint256"
+     			},
+     			{
+     				"name": "lottery_no",
+     				"type": "uint256"
+     			}
+     		],
+     		"name": "getIthBoughtTicketNo",
+     		"outputs": [
+     			{
+     				"name": "",
+     				"type": "uint256"
+     			}
+     		],
+     		"payable": false,
+     		"stateMutability": "view",
+     		"type": "function"
+     	},
+     	{
+     		"constant": true,
+     		"inputs": [
+     			{
+     				"name": "i",
+     				"type": "uint256"
+     			},
+     			{
+     				"name": "lottery_no",
+     				"type": "uint256"
+     			}
+     		],
+     		"name": "getIthWinningTicket",
+     		"outputs": [
+     			{
+     				"name": "ticket_no",
+     				"type": "uint256"
+     			},
+     			{
+     				"name": "amount",
+     				"type": "uint256"
+     			}
+     		],
+     		"payable": false,
+     		"stateMutability": "view",
+     		"type": "function"
+     	},
+     	{
+     		"constant": true,
+     		"inputs": [
+     			{
+     				"name": "lottery_no",
+     				"type": "uint256"
+     			}
+     		],
+     		"name": "getLastBoughtTicketNo",
+     		"outputs": [
+     			{
+     				"name": "",
+     				"type": "uint256"
+     			}
+     		],
+     		"payable": false,
+     		"stateMutability": "view",
+     		"type": "function"
+     	},
+     	{
+     		"constant": true,
+     		"inputs": [
+     			{
+     				"name": "lottery_no",
+     				"type": "uint256"
+     			}
+     		],
+     		"name": "getMoneyCollected",
+     		"outputs": [
+     			{
+     				"name": "amount",
+     				"type": "uint256"
+     			}
+     		],
+     		"payable": false,
+     		"stateMutability": "view",
+     		"type": "function"
+     	},
+     	{
+     		"constant": true,
+     		"inputs": [
+     			{
+     				"name": "x",
+     				"type": "uint256"
+     			}
+     		],
+     		"name": "logarithm2",
+     		"outputs": [
+     			{
+     				"name": "y",
+     				"type": "uint256"
+     			}
+     		],
+     		"payable": false,
+     		"stateMutability": "view",
+     		"type": "function"
+     	}
+    ];
+
+    var abiTokenRaw= [
+    	{
+    		"constant": true,
+    		"inputs": [],
+    		"name": "name",
+    		"outputs": [
+    			{
+    				"name": "",
+    				"type": "string"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "view",
+    		"type": "function"
+    	},
+    	{
+    		"constant": false,
+    		"inputs": [
+    			{
+    				"name": "_spender",
+    				"type": "address"
+    			},
+    			{
+    				"name": "_value",
+    				"type": "uint256"
+    			}
+    		],
+    		"name": "approve",
+    		"outputs": [
+    			{
+    				"name": "success",
+    				"type": "bool"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "nonpayable",
+    		"type": "function"
+    	},
+    	{
+    		"constant": false,
+    		"inputs": [
+    			{
+    				"name": "_from",
+    				"type": "address"
+    			},
+    			{
+    				"name": "_to",
+    				"type": "address"
+    			},
+    			{
+    				"name": "_value",
+    				"type": "uint256"
+    			}
+    		],
+    		"name": "transferFrom",
+    		"outputs": [
+    			{
+    				"name": "success",
+    				"type": "bool"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "nonpayable",
+    		"type": "function"
+    	},
+    	{
+    		"constant": true,
+    		"inputs": [
+    			{
+    				"name": "",
+    				"type": "address"
+    			}
+    		],
+    		"name": "balances",
+    		"outputs": [
+    			{
+    				"name": "",
+    				"type": "uint256"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "view",
+    		"type": "function"
+    	},
+    	{
+    		"constant": true,
+    		"inputs": [],
+    		"name": "decimals",
+    		"outputs": [
+    			{
+    				"name": "",
+    				"type": "uint8"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "view",
+    		"type": "function"
+    	},
+    	{
+    		"constant": true,
+    		"inputs": [
+    			{
+    				"name": "",
+    				"type": "address"
+    			},
+    			{
+    				"name": "",
+    				"type": "address"
+    			}
+    		],
+    		"name": "allowed",
+    		"outputs": [
+    			{
+    				"name": "",
+    				"type": "uint256"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "view",
+    		"type": "function"
+    	},
+    	{
+    		"constant": true,
+    		"inputs": [
+    			{
+    				"name": "_owner",
+    				"type": "address"
+    			}
+    		],
+    		"name": "balanceOf",
+    		"outputs": [
+    			{
+    				"name": "balance",
+    				"type": "uint256"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "view",
+    		"type": "function"
+    	},
+    	{
+    		"constant": true,
+    		"inputs": [],
+    		"name": "symbol",
+    		"outputs": [
+    			{
+    				"name": "",
+    				"type": "string"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "view",
+    		"type": "function"
+    	},
+    	{
+    		"constant": false,
+    		"inputs": [
+    			{
+    				"name": "_to",
+    				"type": "address"
+    			},
+    			{
+    				"name": "_value",
+    				"type": "uint256"
+    			}
+    		],
+    		"name": "transfer",
+    		"outputs": [
+    			{
+    				"name": "success",
+    				"type": "bool"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "nonpayable",
+    		"type": "function"
+    	},
+    	{
+    		"constant": true,
+    		"inputs": [
+    			{
+    				"name": "_owner",
+    				"type": "address"
+    			},
+    			{
+    				"name": "_spender",
+    				"type": "address"
+    			}
+    		],
+    		"name": "allowance",
+    		"outputs": [
+    			{
+    				"name": "remaining",
+    				"type": "uint256"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "view",
+    		"type": "function"
+    	},
+    	{
+    		"inputs": [
+    			{
+    				"name": "_initialAmount",
+    				"type": "uint256"
+    			},
+    			{
+    				"name": "_tokenName",
+    				"type": "string"
+    			},
+    			{
+    				"name": "_decimalUnits",
+    				"type": "uint8"
+    			},
+    			{
+    				"name": "_tokenSymbol",
+    				"type": "string"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "nonpayable",
+    		"type": "constructor"
+    	},
+    	{
+    		"anonymous": false,
+    		"inputs": [
+    			{
+    				"indexed": false,
+    				"name": "",
+    				"type": "address"
+    			},
+    			{
+    				"indexed": false,
+    				"name": "",
+    				"type": "address"
+    			},
+    			{
+    				"indexed": false,
+    				"name": "",
+    				"type": "uint256"
+    			}
+    		],
+    		"name": "Transfer",
+    		"type": "event"
+    	},
+    	{
+    		"anonymous": false,
+    		"inputs": [
+    			{
+    				"indexed": false,
+    				"name": "",
+    				"type": "address"
+    			},
+    			{
+    				"indexed": false,
+    				"name": "",
+    				"type": "address"
+    			},
+    			{
+    				"indexed": false,
+    				"name": "",
+    				"type": "uint256"
+    			}
+    		],
+    		"name": "Approval",
+    		"type": "event"
+    	}
+    ];
+
+
+    contractToken =   web3.eth.contract(abiTokenRaw).at(contractAddressToken);
+    contractBULOT =   web3.eth.contract(abiBulotRaw).at(contractAddressBULOT);
+    //contractToken2 =  web3.eth.contract(abiTokenRaw, contractAddressToken);
+
+    console.log(Web3.version);
+  //  console.log(contractToken2);
+    console.log(contractBULOT);
+    console.log(contractToken);
+  //  console.log(contractToken.methods);
+
+
+
+
+
+    contractToken.balanceOf("0x1aF2b998e0969B16712C6b6D47634c56dC060664",function(error,name){
+      console.log("name ", name)
+    });
+    contractBULOT.getHash(5,function(error, name){
+      console.log("name ", name)
+    });
+
+    contractToken.balanceOf("0x1aF2b998e0969B16712C6b6D47634c56dC060664",function(error, response) {
+    //web3.eth.getBalance(fromaddr,function(error, response) {
+        if (error) {
+            reject(error);
+        }
+        else {
+              console.log("name ", response)
+
+        }
+     }) ;
+     web3.eth.getAccounts(function(err, accounts) {
+  if (err != null) {
+    alert("Error retrieving accounts.");
+    return;
   }
-}
+  if (accounts.length == 0) {
+    alert("No account found! Make sure the Ethereum client is configured properly.");
+    return;
+  }
+  account = accounts[0];
+  console.log('Account: ' + account);
+  web3.eth.defaultAccount = account;
+  account = accounts[1];
+  console.log('Account: ' + account);
+  web3.eth.defaultAccount = account;
+});
 
-     window.addEventListener('load', function() {
-
-       var web3 = window.web3 ;
-
-       if (typeof web3 !== 'undefined') {
-         // Use Mist/MetaMask's provider
-        web3js = new Web3(web3.currentProvider);
-       } else {
-        console.log('No web3? You should consider trying MetaMask!')
-        // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-        web3js = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-      }
-     } ) ;
 
     function generateHash() {
-        var fromaddr = document.getElementById("rndNum").value ;
-        rc = web3js.eth.getHash(fromaddr,function(error, result){
+        var rnd = document.getElementById("rndNum").value ;
+        rc = contractBULOT.getHash(rnd,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
-                   document.getElementById("status").innerHTML = "Balance:" + stat ;
+                   var elem = document.getElementById("random").innerHTML= "Hash is :" + stat ;
+                   console.log("klappt")
                 }
                 else {
                    console.error(error);
@@ -41,11 +641,10 @@ export function setProvider () => {
 
     }
     function buyticket() {
-        var fromaddr = document.getElementById("fromaddr").value ;
-        rc = web3js.eth.getBalance(fromaddr,function(error, result){
+        var rndHash = document.getElementById("rndHash").value ;
+        rc = contractBULOT.buyTicket(rndHash,function(error, result){
                 if(!error) {
-                   var stat = JSON.stringify(result);
-                   document.getElementById("status").innerHTML = "Balance:" + stat ;
+                   document.getElementById("successfullyBought").innerHTML = "successfully bought bought Ticket with Number"  ;
                 }
                 else {
                    console.error(error);
@@ -108,6 +707,19 @@ export function setProvider () => {
             }) ;
 
     }
+    function checkTokenBalance() {
+        var address = document.getElementById("addressForBalance").value ;
+        rc = contractToken.balanceOf(address,function(error, result){
+                if(!error) {
+                   var stat = JSON.stringify(result);
+                   document.getElementById("balance").innerHTML = "Balance:" + stat ;
+                }
+                else {
+                   console.error(error);
+                }
+            }) ;
+
+    }
   </script>
 </head>
 <body>
@@ -119,18 +731,30 @@ export function setProvider () => {
 <h1>BULOT!<span>BUY A TICKET AND GET A CHANCE TO WIN</span></h1>
 <form>
 
+
+  <div class="section"><span></span>GET TOKEN BALANCE </div>
+      <div class="inner-wrap">
+        <label>CHECK YOUR CURRENT BALANCE <textarea id="addressForBalance" name="field6"></textarea></label>
+        <input type="button" onclick="checkTokenBalance();" value="CHECK"> </input>
+
+        <p id="balance"></p>
+
+  </div>
+
+
     <div class="section"><span></span>BUYING TICKET</div>
     <div class="inner-wrap">
       <div class="pull-right">
         <label>GENERATE HASH WITH RANDOM NUMBER <textarea id="rndNum" name="field1"></textarea></label>
-        <button onclick="generateHash()">Generate </button>
+        <input type="button" onclick="generateHash();" value="generate"> </input>
         <p id="random"></p>
 
         <br>
         <br>
 
         <label>BUY TICKET WITH HASH <textarea id="rndHash" name="field2"></textarea></label>
-        <button onclick="buyticket()">BUY </button>
+        <input type="button" onclick="buyticket();" value="BUY"> </input>
+
         <p id="successfullyBought"></p>
 
 
@@ -145,14 +769,16 @@ export function setProvider () => {
     <div class="section"><span></span>REVEAL AND CHECK</div>
     <div class="inner-wrap">
       <label>REVEAL YOUR RANDOM NUMBER <textarea id="rndNumRev" name="field3"></textarea></label>
-      <button onclick="revealNum()">REVEAL </button>
+      <input type="button" onclick="revealNum();" value="REVEAL"> </input>
+
       <p id="revealSuccess"></p>
 
       <br>
       <br>
 
       <label>CHECK IF YOUR TICKET WON <textarea id="ticketNum" name="field4"></textarea></label>
-      <button onclick="checkIfTicketWon()">CHECK </button>
+      <input type="button" onclick="checkIfTicketWon();" value="CHECK"> </input>
+
       <p id="checkWon"></p>
 
 
@@ -165,14 +791,16 @@ export function setProvider () => {
     <div class="section"><span></span>WITHDRAW PRIZE</div>
         <div class="inner-wrap">
           <label>WITHDRAW YOUR PRIZE <textarea id="ticketNumWi" name="field5"></textarea></label>
-          <button onclick="withdrawPrize()">withdraw </button>
+          <input type="button" onclick="withdrawPrize();" value="withdraw"> </input>
+
           <p id="withdrawSuccess"></p>
 
     </div>
     <div class="section"><span></span>GET TOKEN BALANCE </div>
         <div class="inner-wrap">
           <label>WITHDRAW YOUR PRIZE <textarea id="addressForBalance" name="field6"></textarea></label>
-          <button onclick="getBalance()">withdraw </button>
+          <input type="button" onclick="withdrawPrize();" value="withdraw"> </input>
+
           <p id="balance"></p>
 
     </div>
