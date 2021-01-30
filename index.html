@@ -653,11 +653,11 @@
 
     }
     function revealNum() {
-        var fromaddr = document.getElementById("fromaddr").value ;
-        rc = web3js.eth.getBalance(fromaddr,function(error, result){
+        var rndNum = document.getElementById("rndNumRev").value ;
+        rc = contractBULOT.revealRndNumber(rndNum,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
-                   document.getElementById("status").innerHTML = "Balance:" + stat ;
+                   document.getElementById("revealSuccess").innerHTML =  stat ;
                 }
                 else {
                    console.error(error);
