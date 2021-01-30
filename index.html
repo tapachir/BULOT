@@ -59,8 +59,8 @@
 
   } ) ;
 
-     var contractAddressToken = '0xe2F5dDbf0Ee65C7E24F2d8E1AA072e662C09a873';
-     var contractAddressBULOT ='0xE4eF5599D8650c288D6Db0c1476f3357f4AC4Dc0';
+     var contractAddressToken = '0x8bB137d7DD91efFa9F172008bE3183a076f85808';
+     var contractAddressBULOT ='0xF96d52911BE3B84b94afA64dd5d7d3Ee7E5C81D0';
      var abiBulotRaw= [
      	{
      		"constant": false,
@@ -720,6 +720,23 @@
             }) ;
 
     }
+	function approveTokens() {
+		var tokenAmount = Number(document.getElementById("tokenAmount").value) ;
+		console.log("AMOUNT IS ", tokenAmount)
+		console.log("TYPE OF AMOUNT IS ", typeof(tokenAmount))
+		contractToken.approve(contractAddressBULOT, tokenAmount, function(error, result){
+                if(!error) {
+					console.log("RESULT ", result)
+                   var stat = JSON.stringify(result);
+                   document.getElementById("result").innerHTML = "Success" ;
+                }
+                else {
+                   console.error(error);
+                }
+			}) ;
+
+		
+	}
   </script>
 </head>
 <body>
@@ -738,6 +755,15 @@
         <input type="button" onclick="checkTokenBalance();" value="CHECK"> </input>
 
         <p id="balance"></p>
+
+  </div>
+
+  <div class="section"><span></span>APPROVE TOKENS </div>
+      <div class="inner-wrap">
+        <label>APPROVE ERC20 TOKENS TO BULOT CONTRACT <textarea id="tokenAmount" name="field7"></textarea></label>
+        <input type="button" onclick="approveTokens();" value="APPROVE"> </input>
+
+        <p id="result"></p>
 
   </div>
 
