@@ -59,8 +59,8 @@
 
   } ) ;
 
-     var contractAddressToken = '0x8bB137d7DD91efFa9F172008bE3183a076f85808';
-     var contractAddressBULOT ='0xF96d52911BE3B84b94afA64dd5d7d3Ee7E5C81D0';
+     var contractAddressToken = '0x101E0573E704449db6E1f991c3c65429764FFd56';
+     var contractAddressBULOT ='0x01899134779931725AC5e6DDf1Ca8B3f76a5d36B';
      var abiBulotRaw= [
      	{
      		"constant": false,
@@ -632,7 +632,6 @@
                 if(!error) {
                    var stat = JSON.stringify(result);
                    var elem = document.getElementById("random").innerHTML= "Hash is :" + stat ;
-                   console.log("klappt")
                 }
                 else {
                    console.error(error);
@@ -644,7 +643,7 @@
         var rndHash = document.getElementById("rndHash").value ;
         rc = contractBULOT.buyTicket(rndHash,function(error, result){
                 if(!error) {
-                   document.getElementById("successfullyBought").innerHTML = "successfully bought bought Ticket with Number"  ;
+                   document.getElementById("successfullyBought").innerHTML = "successfully bought  Ticket"  ;
                 }
                 else {
                    console.error(error);
@@ -654,10 +653,11 @@
     }
     function revealNum() {
         var rndNum = document.getElementById("rndNumRev").value ;
-        rc = contractBULOT.revealRndNumber(rndNum,function(error, result){
+        var ticket_no = document.getElementById("ticket_no").value ;
+        rc = contractBULOT.revealRndNumber(ticket_no, rndNum,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
-                   document.getElementById("revealSuccess").innerHTML =  stat ;
+                   document.getElementById("revealSuccess").innerHTML =  "successfully revealed Ticket" ;
                 }
                 else {
                    console.error(error);
@@ -666,23 +666,25 @@
 
     }
 
-    function getaddrbalance() {
-        var fromaddr = document.getElementById("fromaddr").value ;
-        rc = web3js.eth.getBalance(fromaddr,function(error, result){
-                if(!error) {
-                   var stat = JSON.stringify(result);
-                   document.getElementById("status").innerHTML = "Balance:" + stat ;
-                }
-                else {
-                   console.error(error);
-                }
-            }) ;
 
-    }
 
+function checkMoneyCollected() {
+    var lottery_no = document.getElementById("lottery_no_amountCollected").value ;
+    rc = contractBULOT.getMoneyCollected(lottery_no,function(error, result){
+            if(!error) {
+               var stat = JSON.stringify(result);
+               document.getElementById("amount").innerHTML = "Collected amount of money in the Lottery is :" + stat ;
+            }
+            else {
+               console.error(error);
+            }
+        }) ;
+
+}
     function withdrawPrize() {
-        var fromaddr = document.getElementById("fromaddr").value ;
-        rc = web3js.eth.getBalance(fromaddr,function(error, result){
+      var lottery_no = document.getElementById("lottery_no_withdraw").value ;
+      var ticket_no = document.getElementById("ticket_no_withdraw").value ;
+        rc = web3js.eth.getBalance(lottery_no, ticket_no,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
                    document.getElementById("status").innerHTML = "Balance:" + stat ;
@@ -720,13 +722,59 @@
             }) ;
 
     }
+
+
+
+
+    function getLastBoughtTicketNo() {
+        var lottery_no = document.getElementById("lottery_no_last_b_ticket").value ;
+        rc = contractToken.getLastBoughtTicketNo(lottery_no,function(error, result){
+                if(!error) {
+                   var stat = JSON.stringify(result);
+                   document.getElementById("lastBought").innerHTML = "Your last bought ticket number is:" + stat ;
+                }
+                else {
+                   console.error(error);
+                }
+            }) ;
+
+    }
+    function getIthBoughtTicketNo() {
+        var index = document.getElementById("index_bought").value ;
+        var lottery_no = document.getElementById("lottery_no_ith_b_ticket").value ;
+        rc = contractToken.getIthBoughtTicketNo(index, lottery_no,function(error, result){
+                if(!error) {
+                   var stat = JSON.stringify(result);
+                   document.getElementById("ithBought").innerHTML = "The "+ index+ " bought ticket number is:" + stat ;
+                }
+                else {
+                   console.error(error);
+                }
+            }) ;
+
+    }
+    function getIthWinningTicketNo() {
+        var index = document.getElementById("index_bought").value ;
+        var lottery_no = document.getElementById("lottery_no_ith_w_ticket").value ;
+        rc = contractToken.getIthWinningTicketNo(index, lottery_no,function(error, result){
+                if(!error) {
+                   var stat = JSON.stringify(result);
+                   document.getElementById("ithWin").innerHTML = "The "+ index+ " winning ticket number is:" + stat ;
+                }
+                else {
+                   console.error(error);
+                }
+            }) ;
+
+    }
 	function approveTokens() {
 		var tokenAmount = Number(document.getElementById("tokenAmount").value) ;
 		console.log("AMOUNT IS ", tokenAmount)
 		console.log("TYPE OF AMOUNT IS ", typeof(tokenAmount))
+    console.log("contractAddress ", contractAddressBULOT )
 		contractToken.approve(contractAddressBULOT, tokenAmount, function(error, result){
                 if(!error) {
-					console.log("RESULT ", result)
+					             console.log("RESULT ", result)
                    var stat = JSON.stringify(result);
                    document.getElementById("result").innerHTML = "Success" ;
                 }
@@ -735,7 +783,7 @@
                 }
 			}) ;
 
-		
+
 	}
   </script>
 </head>
@@ -751,7 +799,7 @@
 
   <div class="section"><span></span>GET TOKEN BALANCE </div>
       <div class="inner-wrap">
-        <label>CHECK YOUR CURRENT BALANCE <textarea id="addressForBalance" name="field6"></textarea></label>
+        <label>CHECK YOUR CURRENT BALANCE <textarea id="addressForBalance" name="field6">Your Address</textarea></label>
         <input type="button" onclick="checkTokenBalance();" value="CHECK"> </input>
 
         <p id="balance"></p>
@@ -760,7 +808,7 @@
 
   <div class="section"><span></span>APPROVE TOKENS </div>
       <div class="inner-wrap">
-        <label>APPROVE ERC20 TOKENS TO BULOT CONTRACT <textarea id="tokenAmount" name="field7"></textarea></label>
+        <label>APPROVE ERC20 TOKENS TO BULOT CONTRACT <textarea id="tokenAmount" name="field7">Amount of tokens to approve</textarea></label>
         <input type="button" onclick="approveTokens();" value="APPROVE"> </input>
 
         <p id="result"></p>
@@ -770,15 +818,14 @@
 
     <div class="section"><span></span>BUYING TICKET</div>
     <div class="inner-wrap">
-      <div class="pull-right">
-        <label>GENERATE HASH WITH RANDOM NUMBER <textarea id="rndNum" name="field1"></textarea></label>
+        <label>GENERATE HASH WITH RANDOM NUMBER <textarea id="rndNum" name="field1">Your random Number</textarea></label>
         <input type="button" onclick="generateHash();" value="generate"> </input>
         <p id="random"></p>
 
         <br>
         <br>
 
-        <label>BUY TICKET WITH HASH <textarea id="rndHash" name="field2"></textarea></label>
+        <label>BUY TICKET WITH HASH <textarea id="rndHash" name="field2">Your generate Hash</textarea></label>
         <input type="button" onclick="buyticket();" value="BUY"> </input>
 
         <p id="successfullyBought"></p>
@@ -794,7 +841,13 @@
 
     <div class="section"><span></span>REVEAL AND CHECK</div>
     <div class="inner-wrap">
-      <label>REVEAL YOUR RANDOM NUMBER <textarea id="rndNumRev" name="field3"></textarea></label>
+      <label>REVEAL YOUR RANDOM NUMBER
+
+      <textarea id="ticket_no" name="field9">Your ticket number number</textarea>
+      <textarea id="rndNumRev" name="field3">Your random number</textarea>
+
+      </label>
+
       <input type="button" onclick="revealNum();" value="REVEAL"> </input>
 
       <p id="revealSuccess"></p>
@@ -802,7 +855,10 @@
       <br>
       <br>
 
-      <label>CHECK IF YOUR TICKET WON <textarea id="ticketNum" name="field4"></textarea></label>
+      <label>CHECK IF YOUR TICKET WON
+      <textarea id="ticket_no_check" name="field4">Your Ticket Number</textarea>
+      <textarea id="lottery_no_check" name="field11">Lottery Number</textarea>
+      </label>
       <input type="button" onclick="checkIfTicketWon();" value="CHECK"> </input>
 
       <p id="checkWon"></p>
@@ -816,18 +872,62 @@
 
     <div class="section"><span></span>WITHDRAW PRIZE</div>
         <div class="inner-wrap">
-          <label>WITHDRAW YOUR PRIZE <textarea id="ticketNumWi" name="field5"></textarea></label>
+          <label>WITHDRAW YOUR PRIZE
+          <textarea id="ticket_no_withdraw" name="field5">Your Ticket Number</textarea>
+          <textarea id="lottery_no_withdraw" name="field10">Lottery Number</textarea></label>
           <input type="button" onclick="withdrawPrize();" value="withdraw"> </input>
 
           <p id="withdrawSuccess"></p>
 
     </div>
-    <div class="section"><span></span>GET TOKEN BALANCE </div>
-        <div class="inner-wrap">
-          <label>WITHDRAW YOUR PRIZE <textarea id="addressForBalance" name="field6"></textarea></label>
-          <input type="button" onclick="withdrawPrize();" value="withdraw"> </input>
 
-          <p id="balance"></p>
+    <div class="section"><span></span>LAST BOOGHT TICKET</div>
+        <div class="inner-wrap">
+          <label>YOUR LAST BOUGHT TICKET
+          <textarea id="lottery_no_last_b_ticket" name="field13">Lottery Number</textarea></label>
+          <input type="button" onclick="getLastBoughtTicketNo();" value="Get"> </input>
+
+          <p id="lastBought"></p>
+
+    </div>
+
+    <div class="section"><span></span>TICKET AFTER INDEX</div>
+        <div class="inner-wrap">
+          <label>SPECIFIC TICKET AFTER INDEX
+          <textarea id="lottery_no_last_b_ticket" name="field14">Lottery Number</textarea>
+          <textarea id="index_bought" name="field15">Index</textarea></label>
+          <input type="button" onclick="getIthBoughtTicketNo();" value="Get"> </input>
+
+          <p id="IthBought"></p>
+
+    </div>
+
+    <div class="section"><span></span>WINNING TICKET AFTER INDEX</div>
+        <div class="inner-wrap">
+          <label>SPECIFIC WINNING TICKET AFTER INDEX
+          <textarea id="lottery_no_ith_w_ticket" name="field16">Lottery Number</textarea>
+          <textarea id="index_win" name="field17">Index</textarea></label>
+          <input type="button" onclick="getIthWinningTicket();" value="Get"> </input>
+
+          <p id="ithWin"></p>
+
+    </div>
+
+    <!-- <div class="section"><span></span>LAST BOUGHT TICKET</div>
+        <div class="inner-wrap">
+          <label>YOUR LAST BOUGHT TICKET
+          <textarea id="lottery_no_last_b_ticket" name="field13">Lottery Number</textarea></label>
+          <input type="button" onclick="getLastBoughtTicketNo();" value="lastBought"> </input>
+
+          <p id="lastBought"></p>
+
+    </div> -->
+    <div class="section"><span></span>GET AMOUNT COLLECTED </div>
+        <div class="inner-wrap">
+          <label>CHECK THE AMOUNT OF MONEY THAT WAS COLLECTED <textarea id="lottery_no_amountCollected" name="field12">Lottery Number</textarea></label>
+          <input type="button" onclick="checkMoneyCollected();" value="check"> </input>
+
+          <p id="amount"></p>
 
     </div>
     </div>
