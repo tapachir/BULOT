@@ -809,7 +809,6 @@ function checkMoneyCollected() {
 <div class="form-style-10">
 <h1>BULOT!<span>BUY A TICKET AND GET A CHANCE TO WIN</span></h1>
 <form>
-
   <div class="section"><span></span>Current Lottery Number </div>
       <div class="inner-wrap">
         <input type="button" onclick="getCurrentLotteryNo();" value="GET"> </input>
@@ -817,10 +816,9 @@ function checkMoneyCollected() {
         <p id="currentNo"></p>
 
   </div>
-
   <div class="section"><span></span>GET TOKEN BALANCE </div>
       <div class="inner-wrap">
-        <label>CHECK YOUR CURRENT BALANCE <textarea id="addressForBalance" name="field6">Your Address</textarea></label>
+        <label>CHECK YOUR CURRENT BALANCE <textarea id="addressForBalance" name="field6" placeholder="Your Address" ></textarea></label>
         <input type="button" onclick="checkTokenBalance();" value="CHECK"> </input>
 
         <p id="balance"></p>
@@ -829,7 +827,7 @@ function checkMoneyCollected() {
 
   <div class="section"><span></span>APPROVE TOKENS </div>
       <div class="inner-wrap">
-        <label>APPROVE ERC20 TOKENS TO BULOT CONTRACT <textarea id="tokenAmount" name="field7">Amount of tokens to approve</textarea></label>
+        <label>APPROVE ERC20 TOKENS TO BULOT CONTRACT <textarea id="tokenAmount" name="field7" placeholder="Amount of tokens to approve"></textarea></label>
         <input type="button" onclick="approveTokens();" value="APPROVE"> </input>
 
         <p id="result"></p>
@@ -839,24 +837,24 @@ function checkMoneyCollected() {
 
     <div class="section"><span></span>BUYING TICKET</div>
     <div class="inner-wrap">
-        <label>GENERATE HASH WITH RANDOM NUMBER <textarea id="rndNum" name="field1">Your random Number</textarea></label>
+        <label>GENERATE HASH WITH RANDOM NUMBER <textarea id="rndNum" name="field1" placeholder="Your random Number"></textarea></label>
         <input type="button" onclick="generateHash();" value="generate"> </input>
         <p id="random"></p>
 
         <br>
         <br>
 
-        <label>BUY TICKET WITH HASH <textarea id="rndHash" name="field2">Your generate Hash</textarea></label>
+        <label>BUY TICKET WITH HASH <textarea id="rndHash" name="field2" placeholder="Your generate Hash"></textarea></label>
         <input type="button" onclick="buyticket();" value="BUY"> </input>
 
         <p id="successfullyBought"></p>
 
 
     </div>
-<br>
-<br>
-<br>
-<br>
+  <br>
+  <br>
+  <br>
+  <br>
 
 
 
@@ -864,8 +862,8 @@ function checkMoneyCollected() {
     <div class="inner-wrap">
       <label>REVEAL YOUR RANDOM NUMBER
 
-      <textarea id="ticket_no" name="field9">Your ticket number number</textarea>
-      <textarea id="rndNumRev" name="field3">Your random number</textarea>
+      <textarea id="ticket_no" name="field9" placeholder="Your ticket number number"></textarea>
+      <textarea id="rndNumRev" name="field3" placeholder="Your random number"></textarea>
 
       </label>
 
@@ -877,8 +875,8 @@ function checkMoneyCollected() {
       <br>
 
       <label>CHECK IF YOUR TICKET WON
-      <textarea id="ticket_no_check" name="field4">Your Ticket Number</textarea>
-      <textarea id="lottery_no_check" name="field11">Lottery Number</textarea>
+      <textarea id="ticket_no_check" name="field4" placeholder="Your Ticket Number"></textarea>
+      <textarea id="lottery_no_check" name="field11" placeholder="Lottery Number"></textarea>
       </label>
       <input type="button" onclick="checkIfTicketWon();" value="CHECK"> </input>
 
@@ -894,8 +892,8 @@ function checkMoneyCollected() {
     <div class="section"><span></span>WITHDRAW PRIZE</div>
         <div class="inner-wrap">
           <label>WITHDRAW YOUR PRIZE
-          <textarea id="ticket_no_withdraw" name="field5">Your Ticket Number</textarea>
-          <textarea id="lottery_no_withdraw" name="field10">Lottery Number</textarea></label>
+          <textarea id="ticket_no_withdraw" name="field5" placeholder="Your Ticket Number"></textarea>
+          <textarea id="lottery_no_withdraw" name="field10" placeholder="Lottery Number" ></textarea></label>
           <input type="button" onclick="withdrawPrize();" value="withdraw"> </input>
 
           <p id="withdrawSuccess"></p>
@@ -905,7 +903,7 @@ function checkMoneyCollected() {
     <div class="section"><span></span>LAST BOOGHT TICKET</div>
         <div class="inner-wrap">
           <label>YOUR LAST BOUGHT TICKET
-          <textarea id="lottery_no_last_b_ticket" name="field13">Lottery Number</textarea></label>
+          <textarea id="lottery_no_last_b_ticket" name="field13"  placeholder="Lottery Number" ></textarea></label>
           <input type="button" onclick="getLastBoughtTicketNo();" value="Get"> </input>
 
           <p id="lastBought"></p>
@@ -915,8 +913,8 @@ function checkMoneyCollected() {
     <div class="section"><span></span>TICKET AFTER INDEX</div>
         <div class="inner-wrap">
           <label>SPECIFIC TICKET AFTER INDEX
-          <textarea id="lottery_no_ith_b_ticket" name="field14">Lottery Number</textarea>
-          <textarea id="index_bought" name="field15">Index</textarea></label>
+          <textarea id="lottery_no_ith_b_ticket" name="field14" placeholder="Lottery Number"></textarea>
+          <textarea id="index_bought" name="field15" placeholder="Index"></textarea></label>
           <input type="button" onclick="getIthBoughtTicketNo();" value="Get"> </input>
 
           <p id="IthBought"></p>
@@ -926,8 +924,8 @@ function checkMoneyCollected() {
     <div class="section"><span></span>WINNING TICKET AFTER INDEX</div>
         <div class="inner-wrap">
           <label>SPECIFIC WINNING TICKET AFTER INDEX
-          <textarea id="lottery_no_ith_w_ticket" name="field16">Lottery Number</textarea>
-          <textarea id="index_win" name="field17">Index</textarea></label>
+          <textarea id="lottery_no_ith_w_ticket" name="field16" placeholder="Lottery Number"></textarea>
+          <textarea id="index_win" name="field17" placeholder="Index"></textarea></label>
           <input type="button" onclick="getIthWinningTicket();" value="Get"> </input>
 
           <p id="ithWin"></p>
@@ -945,7 +943,7 @@ function checkMoneyCollected() {
     </div> -->
     <div class="section"><span></span>GET AMOUNT COLLECTED </div>
         <div class="inner-wrap">
-          <label>CHECK THE AMOUNT OF MONEY THAT WAS COLLECTED <textarea id="lottery_no_amountCollected" name="field12">Lottery Number</textarea></label>
+          <label>CHECK THE AMOUNT OF MONEY THAT WAS COLLECTED <textarea id="lottery_no_amountCollected" name="field12" placeholder="Lottery Number"></textarea></label>
           <input type="button" onclick="checkMoneyCollected();" value="check"> </input>
 
           <p id="amount"></p>
