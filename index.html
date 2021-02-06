@@ -684,7 +684,7 @@ function checkMoneyCollected() {
     function withdrawPrize() {
       var lottery_no = document.getElementById("lottery_no_withdraw").value ;
       var ticket_no = document.getElementById("ticket_no_withdraw").value ;
-        rc = web3js.eth.getBalance(lottery_no, ticket_no,function(error, result){
+        rc = contractBULOT.withdrawPrize(lottery_no, ticket_no,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
                    document.getElementById("withdrawSuccess").innerHTML = "Balance:" + stat ;
@@ -697,8 +697,9 @@ function checkMoneyCollected() {
     }
 
     function checkIfTicketWon() {
-        var fromaddr = document.getElementById("fromaddr").value ;
-        rc = web3js.eth.getBalance(fromaddr,function(error, result){
+      var lottery_no = document.getElementById("lottery_no_check#").value ;
+      var ticket_no = document.getElementById("ticket_no_check").value ;
+        rc = contractBULOT.checkIfTicketWon(lottery_no, ticket_no,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
                    document.getElementById("checkWon").innerHTML = "Balance:" + stat ;
@@ -728,7 +729,7 @@ function checkMoneyCollected() {
 
     function getLastBoughtTicketNo() {
         var lottery_no = document.getElementById("lottery_no_last_b_ticket").value ;
-        rc = contractToken.getLastBoughtTicketNo(lottery_no,function(error, result){
+        rc = contractBULOT.getLastBoughtTicketNo(lottery_no,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
                    document.getElementById("lastBought").innerHTML = "Your last bought ticket number is:" + stat ;
@@ -742,7 +743,7 @@ function checkMoneyCollected() {
     function getIthBoughtTicketNo() {
         var index = document.getElementById("index_bought").value ;
         var lottery_no = document.getElementById("lottery_no_ith_b_ticket").value ;
-        rc = contractToken.getIthBoughtTicketNo(index, lottery_no,function(error, result){
+        rc = contractBULOT.getIthBoughtTicketNo(index, lottery_no,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
                    document.getElementById("ithBought").innerHTML = "The "+ index+ " bought ticket number is:" + stat ;
@@ -756,7 +757,7 @@ function checkMoneyCollected() {
     function getIthWinningTicketNo() {
         var index = document.getElementById("index_bought").value ;
         var lottery_no = document.getElementById("lottery_no_ith_w_ticket").value ;
-        rc = contractToken.getIthWinningTicketNo(index, lottery_no,function(error, result){
+        rc = contractBULOT.getIthWinningTicketNo(index, lottery_no,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
                    document.getElementById("ithWin").innerHTML = "The "+ index+ " winning ticket number is:" + stat ;
