@@ -687,7 +687,7 @@ function checkMoneyCollected() {
         rc = contractBULOT.withdrawTicketPrize(lottery_no, ticket_no,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
-                   document.getElementById("withdrawSuccess").innerHTML = "Balance:" + stat ;
+                   document.getElementById("withdrawSuccess").innerHTML = "Successfully sent the prize. Check your balance. Transaction hash is: " + stat ;
                 }
                 else {
                    console.error(error);
@@ -702,7 +702,7 @@ function checkMoneyCollected() {
         rc = contractBULOT.checkIfTicketWon(lottery_no, ticket_no,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
-                   document.getElementById("checkWon").innerHTML = "Balance:" + stat ;
+                   document.getElementById("checkWon").innerHTML = "The ticket won: " + stat ;
                 }
                 else {
                    console.error(error);
@@ -786,6 +786,19 @@ function checkMoneyCollected() {
 
 
 	}
+
+    function getCurrentLotteryNo() {
+        rc = contractBULOT.getCurrentLotteryNo(function(error, result){
+            if(!error) {
+               var stat = JSON.stringify(result);
+               document.getElementById("currentNo").innerHTML = "Current Lottery Number is  :" + stat ;
+            }
+            else {
+               console.error(error);
+            }
+        }) ;
+
+    }
   </script>
 </head>
 <body>
@@ -797,6 +810,13 @@ function checkMoneyCollected() {
 <h1>BULOT!<span>BUY A TICKET AND GET A CHANCE TO WIN</span></h1>
 <form>
 
+  <div class="section"><span></span>Current Lottery Number </div>
+      <div class="inner-wrap">
+        <input type="button" onclick="getCurrentLotteryNo();" value="GET"> </input>
+
+        <p id="currentNo"></p>
+
+  </div>
 
   <div class="section"><span></span>GET TOKEN BALANCE </div>
       <div class="inner-wrap">
