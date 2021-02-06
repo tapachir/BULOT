@@ -59,8 +59,8 @@
 
   } ) ;
 
-     var contractAddressToken = '0xCEC67116Fb8F95051d70bab0526Efa65CA40F121';
-     var contractAddressBULOT ='0xd2220f47F53eec920a96035eBc99bFEA13e10C8E';
+     var contractAddressToken = '0x2133547373a0ff7F988321CE9830169367cb26E5';
+     var contractAddressBULOT ='0xa448fe0C73a6f6d1ac05B425fD96Dd9e253Be45A';
      var abiBulotRaw= [
      	{
      		"constant": false,
@@ -684,7 +684,7 @@ function checkMoneyCollected() {
     function withdrawPrize() {
       var lottery_no = document.getElementById("lottery_no_withdraw").value ;
       var ticket_no = document.getElementById("ticket_no_withdraw").value ;
-        rc = contractBULOT.withdrawPrize(lottery_no, ticket_no,function(error, result){
+        rc = contractBULOT.withdrawTicketPrize(lottery_no, ticket_no,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
                    document.getElementById("withdrawSuccess").innerHTML = "Balance:" + stat ;
@@ -697,7 +697,7 @@ function checkMoneyCollected() {
     }
 
     function checkIfTicketWon() {
-      var lottery_no = document.getElementById("lottery_no_check#").value ;
+      var lottery_no = document.getElementById("lottery_no_check").value ;
       var ticket_no = document.getElementById("ticket_no_check").value ;
         rc = contractBULOT.checkIfTicketWon(lottery_no, ticket_no,function(error, result){
                 if(!error) {
@@ -755,7 +755,7 @@ function checkMoneyCollected() {
 
     }
     function getIthWinningTicketNo() {
-        var index = document.getElementById("index_bought").value ;
+        var index = document.getElementById("index_win").value ;
         var lottery_no = document.getElementById("lottery_no_ith_w_ticket").value ;
         rc = contractBULOT.getIthWinningTicketNo(index, lottery_no,function(error, result){
                 if(!error) {
