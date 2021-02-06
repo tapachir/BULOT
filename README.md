@@ -14,9 +14,11 @@ On your computer:
 
 6. Install nodejs. (https://nodejs.org/en/download/)
 7. Open up a terminal and execute following commands:
+
    > npm install web3
+   
    > npm install express
 8. Run server with the following command:
    > node server.js
 9. Go to http://localhost:3300 in your Chrome browser.
-10. Enjoy BULOT.
+10. Enjoy BULOT!
