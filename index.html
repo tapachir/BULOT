@@ -687,7 +687,7 @@ function checkMoneyCollected() {
         rc = web3js.eth.getBalance(lottery_no, ticket_no,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
-                   document.getElementById("status").innerHTML = "Balance:" + stat ;
+                   document.getElementById("withdrawSuccess").innerHTML = "Balance:" + stat ;
                 }
                 else {
                    console.error(error);
@@ -701,7 +701,7 @@ function checkMoneyCollected() {
         rc = web3js.eth.getBalance(fromaddr,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
-                   document.getElementById("status").innerHTML = "Balance:" + stat ;
+                   document.getElementById("checkWon").innerHTML = "Balance:" + stat ;
                 }
                 else {
                    console.error(error);
