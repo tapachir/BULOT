@@ -60,7 +60,7 @@
   } ) ;
 
      var contractAddressToken = '0x2133547373a0ff7F988321CE9830169367cb26E5';
-     var contractAddressBULOT ='0xa448fe0C73a6f6d1ac05B425fD96Dd9e253Be45A';
+     var contractAddressBULOT ='0xBcf10469EDbDbB8CeaA8529ccE82b079afD00878';
      var abiBulotRaw= [
      	{
      		"constant": false,
@@ -754,10 +754,10 @@ function checkMoneyCollected() {
             }) ;
 
     }
-    function getIthWinningTicketNo() {
+    function getIthWinningTicket() {
         var index = document.getElementById("index_win").value ;
         var lottery_no = document.getElementById("lottery_no_ith_w_ticket").value ;
-        rc = contractBULOT.getIthWinningTicketNo(index, lottery_no,function(error, result){
+        rc = contractBULOT.getIthWinningTicket(index, lottery_no,function(error, result){
                 if(!error) {
                    var stat = JSON.stringify(result);
                    document.getElementById("ithWin").innerHTML = "The "+ index+ " winning ticket number is:" + stat ;
@@ -900,7 +900,7 @@ function checkMoneyCollected() {
 
     </div>
 
-    <div class="section"><span></span>LAST BOOGHT TICKET</div>
+    <div class="section"><span></span>LAST BOUGHT TICKET</div>
         <div class="inner-wrap">
           <label>YOUR LAST BOUGHT TICKET
           <textarea id="lottery_no_last_b_ticket" name="field13"  placeholder="Lottery Number" ></textarea></label>
@@ -910,9 +910,9 @@ function checkMoneyCollected() {
 
     </div>
 
-    <div class="section"><span></span>TICKET AFTER INDEX</div>
+    <div class="section"><span></span>ITH BOUGHT TICKET</div>
         <div class="inner-wrap">
-          <label>SPECIFIC TICKET AFTER INDEX
+          <label>ITH BOUGHT TICKET NO
           <textarea id="lottery_no_ith_b_ticket" name="field14" placeholder="Lottery Number"></textarea>
           <textarea id="index_bought" name="field15" placeholder="Index"></textarea></label>
           <input type="button" onclick="getIthBoughtTicketNo();" value="Get"> </input>
@@ -921,9 +921,9 @@ function checkMoneyCollected() {
 
     </div>
 
-    <div class="section"><span></span>WINNING TICKET AFTER INDEX</div>
+    <div class="section"><span></span>ITH WINNING TICKET</div>
         <div class="inner-wrap">
-          <label>SPECIFIC WINNING TICKET AFTER INDEX
+          <label>ITH WINNING TICKET
           <textarea id="lottery_no_ith_w_ticket" name="field16" placeholder="Lottery Number"></textarea>
           <textarea id="index_win" name="field17" placeholder="Index"></textarea></label>
           <input type="button" onclick="getIthWinningTicket();" value="Get"> </input>
